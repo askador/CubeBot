@@ -54,7 +54,7 @@ def start_message(message):
                                           "/rules - правила игры\n"
                                           "/kosti - начать игру\n"
                                           "/tryasti - бросить кубик\n"
-                                          "/lave - просмотреть баланс"
+                                          "/lave - просмотреть баланс\n"
                                           "/bonuslave - бонус", reply_markup=markup)
     else:
         bot.send_message(message.chat.id, "Добро пожаловать, в Cube Bot!\n"
