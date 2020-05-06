@@ -12,28 +12,26 @@ token = '996503468:AAFA1AHH7rlHJ_u0YXBJuKYCbxoXfMPrEdY'
 
 bot = telebot.TeleBot(token)
 
-# conn = psycopg2.connect("postgres://rrqxolceeeobto:bbc632ffde0711dece2279432c265ebafcb7503ec8334f2b3b2272e7e38198ef"
-#                         "@ec2-54-75-248-49.eu-west-1.compute.amazonaws.com:5432/dbbupopm8rcq6e")
-# conn.set_client_encoding("UTF8")
-# cur = conn.cursor()
-#
-# Money = 0
-# cf = 0.16666666666666666666666666666667
-# Nums = [1, 2, 3, 4, 5, 6]
-# sys.setrecursionlimit(10 ** 2)
-#
-# Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ',
-#         'CgACAgQAAxkBAAIYLl6jKaIkGk1Evh4-e8Xy6wQyux-DAAJaAgACb7ntUutpUszjF0COGQQ',
-#         'CgACAgIAAxkBAAIYL16jKabyMhMqejWNaXKYnD9ejG6JAAJiBAACn94RSMkn7AO4qNgMGQQ',
-#         'CgACAgQAAxkBAAIYMF6jKahWwvj-S_jMHnNXM3M8CwABtgACFQIAAj3r_FKtfLDEEE_JGhkE',
-#         'CgACAgQAAxkBAAIYMV6jKarED9koopdgh5T4AQnePVOYAAORAAKHGWQH9PG0ucr3uIkZBA',
-#         'CgACAgQAAxkBAAIYMl6jKatmTlt7OIkjaNIwfMjH1EelAAL5AQACd2lFU1qxqx5bO0StGQQ',
-#         'CgACAgQAAxkBAAIYM16jKa4_6XmB4cFcyFVr6DR37ftTAALhAQACp1_0UsLTIm4ovJNYGQQ']
+conn = psycopg2.connect("postgres://ighxfxvoydtukk:c89c907565b4f7263d9d8e3a3f9c3629fbbd939f19aff548bb7d5d9a8da26e09"
+                         "@ec2-54-88-130-244.compute-1.amazonaws.com:5432/d3nkfr8huqp1lb")
+conn.set_client_encoding("UTF8")
+cur = conn.cursor()
+
+Money = 0
+cf = 0.16666666666666666666666666666667
+Nums = [1, 2, 3, 4, 5, 6]
+sys.setrecursionlimit(10 ** 2)
+
+Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ',
+        'CgACAgQAAxkBAAIYLl6jKaIkGk1Evh4-e8Xy6wQyux-DAAJaAgACb7ntUutpUszjF0COGQQ',
+        'CgACAgIAAxkBAAIYL16jKabyMhMqejWNaXKYnD9ejG6JAAJiBAACn94RSMkn7AO4qNgMGQQ',
+        'CgACAgQAAxkBAAIYMF6jKahWwvj-S_jMHnNXM3M8CwABtgACFQIAAj3r_FKtfLDEEE_JGhkE',
+        'CgACAgQAAxkBAAIYMV6jKarED9koopdgh5T4AQnePVOYAAORAAKHGWQH9PG0ucr3uIkZBA',
+        'CgACAgQAAxkBAAIYMl6jKatmTlt7OIkjaNIwfMjH1EelAAL5AQACd2lFU1qxqx5bO0StGQQ',
+        'CgACAgQAAxkBAAIYM16jKa4_6XmB4cFcyFVr6DR37ftTAALhAQACp1_0UsLTIm4ovJNYGQQ']
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    bot.send_message(message.chat.id, "Временные технические шоколадки...")
-    """
     name = message.from_user.first_name
     lastname = message.from_user.last_name
     username = message.from_user.username
@@ -71,54 +69,50 @@ def start_message(message):
                                           "/trasti - бросить кубик\n"
                                           "/lave - просмотреть баланс\n"
                                           "/bonuslave - бонус")
-    """
 
 @bot.message_handler(commands=['rules'])
 def rules_for_player(message):
-    bot.send_message(message.chat.id, "Временные технические шоколадки...")
-    # if message.from_user.id == message.chat.id:
-    #     bot.send_message(message.chat.id, "Угадай число от 1 до 6🎲\n\n"
-    #                                       "Последовательность:\n"
-    #                                       "• отправьте сообщение Кости или нажмите на кнопку 'Кости' для запуска игры\n"
-    #                                       "• сделайте ставку\n"
-    #                                       "• отправьте сообщение Трясти или нажмите на кнопку 'Трясти' для броска кубика\n"
-    #                                       "\n"
-    #                                       "Ставки имеют вид:\n"
-    #                                       "(сколько) на (число(а) кубика)\n"
-    #                                       "Пример:\n"
-    #                                       " 100 на 5 | 50 2\n"
-    #                                       "20 на 1-3 | 30 5-6")
-    # else:
-    #     bot.send_message(message.chat.id, "Используйте эту команду в личке с ботом",
-    #                      reply_to_message_id=message.message_id)
+    if message.from_user.id == message.chat.id:
+        bot.send_message(message.chat.id, "Угадай число от 1 до 6🎲\n\n"
+                                          "Последовательность:\n"
+                                          "• отправьте сообщение Кости или нажмите на кнопку 'Кости' для запуска игры\n"
+                                          "• сделайте ставку\n"
+                                          "• отправьте сообщение Трясти или нажмите на кнопку 'Трясти' для броска кубика\n"
+                                          "\n"
+                                          "Ставки имеют вид:\n"
+                                          "(сколько) на (число(а) кубика)\n"
+                                          "Пример:\n"
+                                          " 100 на 5 | 50 2\n"
+                                          "20 на 1-3 | 30 5-6")
+    else:
+        bot.send_message(message.chat.id, "Используйте эту команду в личке с ботом",
+                         reply_to_message_id=message.message_id)
 
 
 @bot.message_handler(commands=['help'])
 def help_for_player(message):
-    bot.send_message(message.chat.id, "Временные технические шоколадки...")
-    # if message.from_user.id == message.chat.id:
-    #     bot.send_message(message.chat.id, "<b>Игровые команды:</b>\n\n"
-    #                                       "<b>Кости</b> - запустить игру\n"
-    #                                       "<b>Трясти</b> - бросить кубик\n"
-    #                                       "<b>Отмена</b> - отмена ставок\n"
-    #                                       "<b>Лавэ</b> - зырнуть наличные\n"
-    #                                       "<b>Бонус</b> - забрать бонус (раз в 6 часов)"
-    #                                       "<b>Ставки</b> - зырнуть шо поставил\n"
-    #                                       "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n"
-    #                                       "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n"
-    #                                       "\n"
-    #                                       "<b>Над ботом работали:</b>\n"
-    #                                       "<a href='tg://user?id=526497876'><b>Серый</b></a> и "
-    #                                       "<a href='tg://user?id=547400918'><b>Миша</b></a>",
-    #                      parse_mode="HTML")
-    # else:
-    #     bot.send_message(message.chat.id, "Используйте эту команду в личке с ботом",
-    #                      reply_to_message_id=message.message_id)
+    if message.from_user.id == message.chat.id:
+        bot.send_message(message.chat.id, "<b>Игровые команды:</b>\n\n"
+                                          "<b>Кости</b> - запустить игру\n"
+                                          "<b>Трясти</b> - бросить кубик\n"
+                                          "<b>Отмена</b> - отмена ставок\n"
+                                          "<b>Лавэ</b> - зырнуть наличные\n"
+                                          "<b>Бонус</b> - забрать бонус (раз в 6 часов)"
+                                          "<b>Ставки</b> - зырнуть шо поставил\n"
+                                          "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n"
+                                          "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n"
+                                          "\n"
+                                          "<b>Над ботом работали:</b>\n"
+                                          "<a href='tg://user?id=526497876'><b>Серый</b></a> и "
+                                          "<a href='tg://user?id=547400918'><b>Миша</b></a>",
+                         parse_mode="HTML")
+    else:
+        bot.send_message(message.chat.id, "Используйте эту команду в личке с ботом",
+                         reply_to_message_id=message.message_id)
 
 
 #
 #   FOR ME
-'''
 @bot.message_handler(commands=['statslog'])
 def stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918 and message.text == '/statslog':
@@ -134,7 +128,7 @@ def stats(message):
             cur.execute("UPDATE STATS set WON = 0, LOST = 0, PLAYS = 0")
             conn.commit()
             bot.send_message(message.chat.id, "Сброшено")
-    except:
+    except Exception:
         pass
 
 
@@ -155,11 +149,9 @@ def setmoney(message):
                 cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (int(howmch[1:]), int(towho)))
                 conn.commit()
                 bot.send_message(papaid, "ADDed")
-                bot.send_message(towho, "Бонус %s💰" % howmch)
+                bot.send_message(towho, "Бонус %s💰" % makegoodview(howmch[1:]))
         except Exception:
             pass
-'''
-
 #
 #
 
@@ -168,8 +160,6 @@ def setmoney(message):
 def start_game(message):
     global Game, Shake
     if len(message.text.split()) == 1 and ''.join(list(message.text.lower())[:5]) == "кости":
-        bot.send_message(message.chat.id, "Временные технические шоколадки...")
-        '''
         name = message.from_user.first_name
         lastname = message.from_user.last_name
         username = message.from_user.username
@@ -216,8 +206,7 @@ def start_game(message):
         except Exception:
             time.sleep(1)
 
-        '''
-"""      
+
 bonnums = []
 @bot.callback_query_handler(func=lambda c: True)
 def inl(c):
@@ -1027,7 +1016,6 @@ def shake_game(message):
 
     if len(message.text.split()) == 1 and ''.join(list(message.text.lower())[:2]) == "го" \
             or ''.join(list(message.text.lower())[:6]) == "трясти":
-        bot.send_message(message.chat.id, "Временные технические шоколадки...")
 
         #   ВЫГРУЗКА ПАРАМЕТРА GAME
         try:
@@ -1122,14 +1110,14 @@ def userbets(message):
                 Stavki = ''
 
                 try:
-                    if allbets != []:
+                    if allbets:
                         cur.execute("SELECT Numbers FROM BETS WHERE UserId = %i AND IDChat = %i AND Bet != 0" %
                                     (userid, chatid))
                         allnums = cur.fetchall()
                         for i in range(len(allbets)):
                             bets = str(allbets[i][0])
                             nums = str(allnums[i][0])
-                            Stavki += bets + ' грыв на ' + nums + '\n'
+                            Stavki += makegoodview(bets) + ' грыв на ' + nums + '\n'
                         if Stavki == '':
                             bot.send_message(chatid, "%s, нэма ставок" % Name)
                         else:
@@ -1168,14 +1156,12 @@ def logsgame(message):
             bot.send_message(chatid, "Лог пустой")
     except Exception:
         time.sleep(1)
-"""
+
 
 @bot.message_handler(commands=['lave'])
 @bot.message_handler(content_types=['text'], regexp='Лавэ')
 def usermoney(message):
     if len(message.text.split()) == 1:
-        bot.send_message(message.chat.id, "Временные технические шоколадки...")
-        """
         name = message.from_user.first_name
         lastname = message.from_user.last_name
         username = message.from_user.username
@@ -1187,11 +1173,10 @@ def usermoney(message):
             mon = cur.fetchall()[0][0]
 
 
-            bot.send_message(chatid, "%i грывень" % mon, reply_to_message_id=message.message_id)
+            bot.send_message(chatid, "%s грывень" % makegoodview(mon), reply_to_message_id=message.message_id)
         except Exception:
             time.sleep(1)
 
-        """
 
 bonusmesid = {}
 @bot.message_handler(commands=['bonuslave'])
@@ -1199,8 +1184,6 @@ bonusmesid = {}
 def bonus(message):
     global bonusmesid, lavebonus, mnozitel, numbonus, bonusdate, bonuserid, bonnums, value
     if len(message.text.split()) == 1:
-        bot.send_message(message.chat.id, "Временные технические шоколадки...")
-        """
         chatid = message.chat.id
         name = message.from_user.first_name
         bonuserid = message.from_user.id
@@ -1243,7 +1226,6 @@ def bonus(message):
 
             cur.execute("UPDATE USERS set BONUSTIME = %i WHERE UserId = %i" % (punkt, bonuserid))
             conn.commit()
-            """
 
 @bot.message_handler(content_types=['text'], regexp='!рейтинг')
 def top(message):
@@ -1253,7 +1235,7 @@ def top(message):
 def statuser(message):
     pass
 
-"""
+
 #  ПРИНЯТИЕ СТАВОК
 @bot.message_handler(content_types=['text'])
 def chekbet(message):
@@ -1306,8 +1288,8 @@ def chekbet(message):
                                     userid, num, chatid))
                             UsBet = cur.fetchall()[0][0]
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet + UsBet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet + UsBet), num),
                                              reply_to_message_id=message.message_id,
                                              parse_mode="HTML")
 
@@ -1321,8 +1303,8 @@ def chekbet(message):
                             conn.commit()
                         else:
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet), num),
                                              reply_to_message_id=message.message_id, parse_mode="HTML")
 
                             cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat) "
@@ -1370,8 +1352,8 @@ def chekbet(message):
                                     userid, num))
                             UsBet = cur.fetchall()[0][0]
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet + UsBet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet + UsBet), num),
                                              reply_to_message_id=message.message_id,
                                              parse_mode="HTML")
 
@@ -1386,8 +1368,8 @@ def chekbet(message):
                             conn.commit()
                         else:
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet), num),
                                              reply_to_message_id=message.message_id, parse_mode="HTML")
 
                             cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat) "
@@ -1434,8 +1416,8 @@ def chekbet(message):
                                     userid, num))
                             UsBet = cur.fetchall()[0][0]
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet + UsBet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet + UsBet), num),
                                              reply_to_message_id=message.message_id,
                                              parse_mode="HTML")
                             cur.execute(
@@ -1448,8 +1430,8 @@ def chekbet(message):
                             conn.commit()
                         else:
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet), num),
                                              reply_to_message_id=message.message_id, parse_mode="HTML")
 
                             cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat) "
@@ -1491,8 +1473,8 @@ def chekbet(message):
                                     userid, num))
                             UsBet = cur.fetchall()[0][0]
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet + UsBet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet + UsBet), num),
                                              reply_to_message_id=message.message_id,
                                              parse_mode="HTML")
 
@@ -1506,8 +1488,8 @@ def chekbet(message):
                             conn.commit()
                         else:
                             bot.send_message(chatid,
-                                             "<a href='tg://user?id=%i'>%s</a> поставил %i грывэнь на %s" % (
-                                                 userid, name, bet, num),
+                                             "<a href='tg://user?id=%i'>%s</a> поставил %s грывэнь на %s" % (
+                                                 userid, name, makegoodview(bet), num),
                                              reply_to_message_id=message.message_id, parse_mode="HTML")
 
                             cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat) "
@@ -1549,7 +1531,7 @@ def chekbet(message):
                                 "UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (howmuch, whoid))
                             bot.send_message(chatid,
                                              "<a href='tg://user?id=%i'>%s</a> передал <a href='tg://user?id=%i'>%s</a> %s грывень" %
-                                             (userid, name, whoid, whoname, howmuch),
+                                             (userid, name, whoid, whoname, makegoodview(howmuch)),
                                              parse_mode="HTML")
                             conn.commit()
                         else:
@@ -1588,6 +1570,22 @@ def game(message):
                                         "Угадай число от 1 до 6\n"
                                         "Делай ставки не скупи💰\n",
                                 reply_markup=key)
+
+
+def makegoodview(how):
+    how = str(how)
+    how = list(how)
+    q = 0
+    for i in range(1, len(how) + 1):
+        if -i % 3 == 0:
+            how.insert(-(i + q), ',')
+            q += 1
+    if how[0] == ',':
+        del how[0]
+    how = ''.join(how)
+
+    return how
+
 
 def alldata(name, lastname, username, userid, chatid):
     #   ДОБАВЛЕНИЕ ЧАТА
@@ -1673,7 +1671,6 @@ def shake(message):
     WINstat = ''
     ALLwins = 0
     Lose = 0
-
     cur.execute("SELECT Id FROM BETS WHERE IDChat = %i AND Bet > 0" % chatid)
     IDs = cur.fetchall()
     for id in IDs:
@@ -1696,7 +1693,7 @@ def shake(message):
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = '%i'" % (Prize, UsId))
             conn.commit()
             WINstat += "💰<a href='tg://user?id=%i'>%s</a>" % (UsId, Names) + \
-                       " заработал " + str(Prize) + ' грывень на ' + UsNum + "\n"
+                       " заработал " + makegoodview(Prize) + ' грывень на ' + UsNum + "\n"
 
         elif len(UsNum.split('-')) == 1 and int(UsNum) == Number:
             Prize = int(int(UsBet) * 6)
@@ -1704,21 +1701,10 @@ def shake(message):
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (Prize, UsId))
             conn.commit()
             WINstat += "💰<a href='tg://user?id=%i'>%s</a>" % (UsId, Names) + \
-                       " заработал " + str(Prize) + ' грывень на ' + UsNum + "\n"
+                       " заработал " + makegoodview(Prize) + ' грывень на ' + UsNum + "\n"
 
         try:
-            if int(UsNum) != Number:
-                Lose += 1
-        except Exception:
-            pass
-
-        try:
-            if int(UsNum.split('-')[1]) < Number:
-                Lose += 1
-        except Exception:
-            pass
-        try:
-            if Number <= int(UsNum.split('-')[0]):
+            if int(UsNum) != Number or int(UsNum.split('-')[1]) < Number or Number <= int(UsNum.split('-')[0]):
                 Lose += 1
         except Exception:
             pass
@@ -1867,7 +1853,7 @@ def algoritm(message):
         cur.execute("DELETE FROM %s WHERE Id <= (SELECT MAX(Id) FROM %s) - 10" % (namedb, namedb))
         conn.commit()
 
-"""
+
 
 
 bot.polling(none_stop=False, interval=0, timeout=100)
