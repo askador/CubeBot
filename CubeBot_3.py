@@ -1163,8 +1163,7 @@ def logsgame(message):
 @bot.message_handler(commands=['lave'])
 @bot.message_handler(content_types=['text'], regexp='Лавэ')
 def usermoney(message):
-    if len(message.text.split()) == 1 and ''.join(list(message.text.lower())[:4]) == "лавэ"\
-            or message.text == '/lave' or message.text == '/lave@ccubickbot':
+    if len(message.text.split()) == 1:
         name = message.from_user.first_name
         lastname = message.from_user.last_name
         username = message.from_user.username
