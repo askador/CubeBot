@@ -1174,15 +1174,6 @@ def usermoney(message):
             cur.execute("SELECT Money From USERS Where UserId = '%i'" % userid)
             mon = cur.fetchall()[0][0]
 
-            mon = list(mon)
-            q = 0
-            for i in range(1, len(mon) + 1):
-                if -i % 3 == 0:
-                    print(-(i + q))
-                    mon.insert(-(i + q), ' ')
-                    q += 1
-
-            mon = ''.join(mon)
 
             bot.send_message(chatid, "%i грывень" % mon, reply_to_message_id=message.message_id)
         except Exception:
@@ -1687,7 +1678,6 @@ def shake(message):
         #   ВЫИГРАЛИ
         if len(UsNum.split('-')) == 2 and int(UsNum.split('-')[0]) <= Number <= int(UsNum.split('-')[1]):
             Prize = int(int(UsBet) * 6 / (int(UsNum.split('-')[1]) - int(UsNum.split('-')[0]) + 1))
-            makegoodview(Prize)
             ALLwins += 1
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = '%i'" % (Prize, UsId))
             conn.commit()
@@ -1696,7 +1686,6 @@ def shake(message):
 
         elif len(UsNum.split('-')) == 1 and int(UsNum) == Number:
             Prize = int(int(UsBet) * 6)
-            makegoodview(Prize)
             ALLwins += 1
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (Prize, UsId))
             conn.commit()
@@ -1865,17 +1854,6 @@ def algoritm(message):
         conn.commit()
 
 
-def makegoodview(howmany):
-    howmany = str(howmany)
-    howmany = list(howmany)
-    q = 0
-    for i in range(1, len(howmany) + 1):
-        if -i % 3 == 0:
-            print(-(i + q))
-            howmany.insert(-(i + q), ' ')
-            q += 1
 
-    howmany = ''.join(howmany)
-    return howmany
 
 bot.polling(none_stop=False, interval=0, timeout=100)
