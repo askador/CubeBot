@@ -1014,7 +1014,7 @@ def inl(c):
 
     except Exception:
         time.sleep(1)
-"""
+
 
 bul = False
 @bot.message_handler(commands=['tryasti'])
@@ -1028,7 +1028,7 @@ def shake_game(message):
     if len(message.text.split()) == 1 and ''.join(list(message.text.lower())[:2]) == "го" \
             or ''.join(list(message.text.lower())[:6]) == "трясти":
         bot.send_message(message.chat.id, "Временные технические шоколадки...")
-        """
+
         #   ВЫГРУЗКА ПАРАМЕТРА GAME
         try:
             cur.execute("SELECT Game FROM GAME WHERE IDChat = '%i'" % chatid)
@@ -1065,8 +1065,8 @@ def shake_game(message):
         #   АНТИСПАМ
         if Game is False and Shake is False:
             pass
-        """
-"""
+
+
 @bot.message_handler(content_types=['text'], regexp='Отмена')
 def cancelbets(message):
     chatid = message.chat.id
