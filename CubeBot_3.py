@@ -1803,18 +1803,18 @@ def shake(message):
     except Exception:
         pass
 
-    # for i in range(len(to_del)):
-    #     bot.delete_message(chatid, to_del[i])
-    # to_del = []
+    for i in range(len(to_del)):
+        bot.delete_message(chatid, to_del[i])
+    to_del = []
 
     text = "[%s](tg://user?id=%i) бросает кубик (5 секунд)" % (name, userid)
     mes1 = bot.send_message(chatid, text=text, parse_mode="Markdown")
 
     time.sleep(5)
-    #mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
+    mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
     time.sleep(2)
     bot.delete_message(chatid, mes1.message_id)
-    #bot.delete_message(chatid, mes2.message_id)
+    bot.delete_message(chatid, mes2.message_id)
 
     #   РАНДОМНОЕ ЧИСЛО
     algoritm(message)
