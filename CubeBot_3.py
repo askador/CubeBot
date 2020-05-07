@@ -1314,6 +1314,7 @@ def top(message):
         except Exception:
             pass
 
+
 @bot.message_handler(content_types=['text'], regexp='!стата')
 def statuser(message):
     chatid = message.chat.id
@@ -1330,8 +1331,8 @@ def statuser(message):
                 else:
                     Name = str(usstat[0][0]) + ' ' + str(usstat[0][1])
                 Lave = makegoodview(usstat[0][2])
-                Won = usstat[0][3]
-                Lost = usstat[0][4]
+                Won = makegoodview(str(usstat[0][3]))
+                Lost = makegoodview(str(usstat[0][4]))
 
                 profile += "<b>Имя: </b>%s\n" \
                            "<b>Лавэ: </b>%s\n" \
@@ -1351,8 +1352,8 @@ def statuser(message):
                 else:
                     Name = str(usstat[0][0]) + ' ' + str(usstat[0][1])
                 Lave = makegoodview(usstat[0][2])
-                Won = usstat[0][3]
-                Lost = usstat[0][4]
+                Won = makegoodview(str(usstat[0][3]))
+                Lost = makegoodview(str(usstat[0][4]))
 
                 profile += "<b>Имя: </b>%s\n" \
                            "<b>Лавэ: </b>%s\n" \
