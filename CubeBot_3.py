@@ -1297,8 +1297,9 @@ def top(message):
                 cur.execute("SELECT UserId, Name, LastName, Money FROM USERS ORDER BY Money")
                 top = cur.fetchall()
                 for k in range(len(top)):
-                    if i[0] == top[k][0]:
-                        rate.append(top[k][1:])
+                    if top[k][0] != 547400918 and top[k][0] != 526497876:
+                        if i[0] == top[k][0]:
+                            rate.append(top[k][1:])
 
             ratesort = sorted(rate, key=lambda money: money[2])[::-1]
             for i in range(10):
