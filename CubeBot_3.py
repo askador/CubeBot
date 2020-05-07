@@ -1261,15 +1261,24 @@ def top(message):
                 for k in range(len(top)):
                     if i[0] == top[k][0]:
                         rate.append(top[k][1:])
-
             ratesort = sorted(rate, key=lambda money: money[2])[::-1]
-            for i in range(30):
-                q += 1
-                if ratesort[i][1] == 'None':
-                    topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + makegoodview(ratesort[i][2]) + '\n'
-                else:
-                    topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + str(ratesort[i][1]) + ' ' + \
-                               makegoodview(ratesort[i][2]) + '\n'
+
+            if len(ratesort) <= 30:
+                for i in range(len(ratesort)):
+                    q += 1
+                    if ratesort[i][1] == 'None':
+                        topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + makegoodview(ratesort[i][2]) + '\n'
+                    else:
+                        topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + str(ratesort[i][1]) + ' ' + \
+                                   makegoodview(ratesort[i][2]) + '\n'
+            else:
+                for i in range(30):
+                    q += 1
+                    if ratesort[i][1] == 'None':
+                        topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + makegoodview(ratesort[i][2]) + '\n'
+                    else:
+                        topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + str(ratesort[i][1]) + ' ' + \
+                                   makegoodview(ratesort[i][2]) + '\n'
 
             bot.send_message(chatid, topchik)
         except Exception:
@@ -1794,18 +1803,18 @@ def shake(message):
     except Exception:
         pass
 
-    for i in range(len(to_del)):
-        bot.delete_message(chatid, to_del[i])
-    to_del = []
+    # for i in range(len(to_del)):
+    #     bot.delete_message(chatid, to_del[i])
+    # to_del = []
 
     text = "[%s](tg://user?id=%i) бросает кубик (5 секунд)" % (name, userid)
     mes1 = bot.send_message(chatid, text=text, parse_mode="Markdown")
 
     time.sleep(5)
-    mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
+    #mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
     time.sleep(2)
     bot.delete_message(chatid, mes1.message_id)
-    bot.delete_message(chatid, mes2.message_id)
+    #bot.delete_message(chatid, mes2.message_id)
 
     #   РАНДОМНОЕ ЧИСЛО
     algoritm(message)
