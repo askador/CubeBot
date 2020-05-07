@@ -1822,6 +1822,10 @@ def shake(message):
     #   ВЫГРУЗКА ВСЕХ СТАВОК
     endgame(message)
 
+    namedb = 'logchat' + str(abs(chatid))
+    cur.execute("INSERT INTO %s (Log) VALUES (%i)" % (namedb, Number))
+    conn.commit()
+
     #   STOP GAME
     cur.execute("UPDATE GAME set Game = False WHERE IDChat = %i" % chatid)
     conn.commit()
@@ -1883,7 +1887,7 @@ def endgame(message):
         try:
             if int(UsNum) != Number or int(UsNum.split('-')[1]) < Number or Number <= int(UsNum.split('-')[0]):
                 Lose += 1
-                cur.execute("UPDATE USERS set LOST = LOST + %s WHERE UserId = '%i'" % (UsBet, UsId))
+                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = '%i'" % (int(UsBet), UsId))
                 conn.commit()
 
         except Exception:
