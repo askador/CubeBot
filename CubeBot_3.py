@@ -1259,8 +1259,9 @@ def top(message):
                 cur.execute("SELECT UserId, Name, LastName, Money FROM USERS ORDER BY Money")
                 top = cur.fetchall()
                 for k in range(len(top)):
-                    if i[0] == top[k][0]:
-                        rate.append(top[k][1:])
+                    if top[k][0] != 547400918 and top[k][0] != 526497876:
+                        if i[0] == top[k][0]:
+                            rate.append(top[k][1:])
             ratesort = sorted(rate, key=lambda money: money[2])[::-1]
 
             if len(ratesort) <= 30:
@@ -1344,7 +1345,6 @@ def statuser(message):
                 cur.execute("SELECT Name, LastName, Money, Won, Lost FROM Users WHERE UserId = %i" % userid)
                 usstat = cur.fetchall()
                 profile = ''
-
                 if usstat[0][1] == 'None':
                     Name = str(usstat[0][0])
                 else:
@@ -1885,11 +1885,26 @@ def endgame(message):
                        " заработал " + makegoodview(Prize) + ' грывень на ' + UsNum + "\n"
 
         try:
-            if int(UsNum) != Number or int(UsNum.split('-')[1]) < Number or Number <= int(UsNum.split('-')[0]):
+            if int(UsNum) != Number:
                 Lose += 1
-                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = '%i'" % (int(UsBet), UsId))
+                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
                 conn.commit()
+        except Exception:
+            pass
 
+        try:
+            if int(UsNum.split('-')[1]) < Number:
+                Lose += 1
+                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
+                conn.commit()
+        except Exception:
+            pass
+
+        try:
+            if Number <= int(UsNum.split('-')[0]):
+                Lose += 1
+                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
+                conn.commit()
         except Exception:
             pass
 
