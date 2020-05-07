@@ -1196,13 +1196,11 @@ def usermoney(message):
 
 
 bonusmesid = {}
-
-
 @bot.message_handler(commands=['bonuslave'])
 @bot.message_handler(content_types=['text'], regexp='Бонус')
 def bonus(message):
     global bonusmesid, lavebonus, mnozitel, numbonus, bonusdate, bonuserid, bonnums, value
-    if len(message.text.split()) == 1 and message.text.lower()[:5] == 'бонус':
+    if len(message.text.split()) == 1:
         chatid = message.chat.id
         name = message.from_user.first_name
         bonuserid = message.from_user.id
