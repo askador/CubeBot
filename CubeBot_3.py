@@ -1376,7 +1376,7 @@ def statuser(message):
 #  ПРИНЯТИЕ СТАВОК
 @bot.message_handler(content_types=['text'])
 def chekbet(message):
-    global cur, conn, bet, num, Game, checkgame
+    global cur, conn, bet, num, Game, checkgame, to_del
     name = message.from_user.first_name
     lastname = message.from_user.last_name
     username = message.from_user.username
