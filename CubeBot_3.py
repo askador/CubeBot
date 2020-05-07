@@ -176,9 +176,6 @@ def start_game(message):
         alldataCHAT(chatid)
         alldataUSERS(name, lastname, username, userid, chatid)
 
-        cur.execute("SELECT IDChat, UserId FROM chatusers")
-        z = cur.fetchall()
-        print(z)
 
         #   ВЫГРУЗКА ПАРАМЕТРА Shake
         #   ВЫГРУЗКА ПАРАМЕТРА GAME
@@ -1256,7 +1253,6 @@ def top(message):
         chatid = message.chat.id
         cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
         topofchat = cur.fetchall()
-        print(topofchat)
         topchik = ""
         q = 0
         for i in topofchat:
@@ -1276,7 +1272,6 @@ def top(message):
         chatid = message.chat.id
         cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
         topofchat = cur.fetchall()
-        print(topofchat)
         topchik = ""
         q = 0
         for i in topofchat:
@@ -1343,7 +1338,6 @@ def statuser(message):
 
     try:
         if message.text.split()[0] == '!стата' and message.text.lower().split()[1] == "сбросить":
-            print(message.text)
             userid = message.from_user.id
             cur.execute("UPDATE USERS set WON = 0, LOST = 0 WHERE UserId = %i" % userid)
             conn.commit()
