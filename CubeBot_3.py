@@ -1250,91 +1250,99 @@ def bonus(message):
 @bot.message_handler(content_types=['text'], regexp='!рейтинг')
 def top(message):
     if len(message.text.split()) == 1 and message.text == '!рейтинг' and message.chat.id != message.from_user.id:
-        chatid = message.chat.id
-        cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
-        topofchat = cur.fetchall()
-        topchik = ""
-        q = 0
-        for i in topofchat:
-            q += 1
-            cur.execute("SELECT Name, LastName, Money FROM USERS WHERE UserId = %i ORDER BY Money DESC LIMIT 30" % i)
-            top = cur.fetchall()
-            for k in range(len(top)):
-                if top[k][1] != 'None':
-                    topchik += str(q) + '. ' + str(top[k][0]) + ' ' + str(top[k][1]) + ' ' + makegoodview(
-                        top[k][2]) + '\n'
-                else:
-                    topchik += str(q) + '. ' + str(top[k][0]) + ' ' + makegoodview(top[k][2]) + '\n'
+        try:
+            chatid = message.chat.id
+            cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
+            topofchat = cur.fetchall()
+            topchik = ""
+            q = 0
+            for i in topofchat:
+                q += 1
+                cur.execute("SELECT Name, LastName, Money FROM USERS WHERE UserId = %i ORDER BY Money DESC LIMIT 30" % i)
+                top = cur.fetchall()
+                for k in range(len(top)):
+                    if top[k][1] != 'None':
+                        topchik += str(q) + '. ' + str(top[k][0]) + ' ' + str(top[k][1]) + ' ' + makegoodview(
+                            top[k][2]) + '\n'
+                    else:
+                        topchik += str(q) + '. ' + str(top[k][0]) + ' ' + makegoodview(top[k][2]) + '\n'
 
-        bot.send_message(chatid, topchik)
+            bot.send_message(chatid, topchik)
+        except Exception:
+            pass
 
     elif len(message.text.split()) == 2 and message.text == '!рейтинг 10' and message.chat.id != message.from_user.id:
-        chatid = message.chat.id
-        cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
-        topofchat = cur.fetchall()
-        topchik = ""
-        q = 0
-        for i in topofchat:
-            q += 1
-            cur.execute("SELECT Name, LastName, Money FROM USERS WHERE UserId = %i ORDER BY Money DESC LIMIT 10" % i)
-            top = cur.fetchall()
-            for k in range(len(top)):
-                if top[k][1] != 'None':
-                    topchik += str(q) + '. ' + str(top[k][0]) + ' ' + str(top[k][1]) + ' ' + makegoodview(
-                        top[k][2]) + '\n'
-                else:
-                    topchik += str(q) + '. ' + str(top[k][0]) + ' ' + makegoodview(top[k][2]) + '\n'
+        try:
+            chatid = message.chat.id
+            cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
+            topofchat = cur.fetchall()
+            topchik = ""
+            q = 0
+            for i in topofchat:
+                q += 1
+                cur.execute("SELECT Name, LastName, Money FROM USERS WHERE UserId = %i ORDER BY Money DESC LIMIT 10" % i)
+                top = cur.fetchall()
+                for k in range(len(top)):
+                    if top[k][1] != 'None':
+                        topchik += str(q) + '. ' + str(top[k][0]) + ' ' + str(top[k][1]) + ' ' + makegoodview(
+                            top[k][2]) + '\n'
+                    else:
+                        topchik += str(q) + '. ' + str(top[k][0]) + ' ' + makegoodview(top[k][2]) + '\n'
 
-        bot.send_message(chatid, topchik)
-
+            bot.send_message(chatid, topchik)
+        except Exception:
+            pass
 
 @bot.message_handler(content_types=['text'], regexp='!стата')
 def statuser(message):
     chatid = message.chat.id
     if len(message.text.split()) == 1 and message.text == '!стата':
-        if message.reply_to_message is not None and message.reply_to_message.json['from']['is_bot'] is False:
-            userid = message.reply_to_message.from_user.id
-            cur.execute("SELECT Name, LastName, Money, Won, Lost FROM Users WHERE UserId = %i" % userid)
-            usstat = cur.fetchall()
-            profile = ''
+        try:
+            if message.reply_to_message is not None and message.reply_to_message.json['from']['is_bot'] is False:
+                userid = message.reply_to_message.from_user.id
+                cur.execute("SELECT Name, LastName, Money, Won, Lost FROM Users WHERE UserId = %i" % userid)
+                usstat = cur.fetchall()
+                profile = ''
 
-            if usstat[0][1] == 'None':
-                Name = str(usstat[0][0])
+                if usstat[0][1] == 'None':
+                    Name = str(usstat[0][0])
+                else:
+                    Name = str(usstat[0][0]) + ' ' + str(usstat[0][1])
+                Lave = makegoodview(usstat[0][2])
+                Won = usstat[0][3]
+                Lost = usstat[0][4]
+
+                profile += "<b>Имя: </b>%s\n" \
+                           "<b>Лавэ: </b>%s\n" \
+                           "<b>Выиграно: </b>%s\n" \
+                           "<b>Проиграно: </b>%s\n" \
+                           "\n" \
+                           "<b>Id: </b>%i" % (Name, Lave, Won, Lost, userid)
+                bot.send_message(chatid, profile, parse_mode='HTML')
+
             else:
-                Name = str(usstat[0][0]) + ' ' + str(usstat[0][1])
-            Lave = makegoodview(usstat[0][2])
-            Won = usstat[0][3]
-            Lost = usstat[0][4]
+                userid = message.from_user.id
+                cur.execute("SELECT Name, LastName, Money, Won, Lost FROM Users WHERE UserId = %i" % userid)
+                usstat = cur.fetchall()
+                profile = ''
 
-            profile += "<b>Имя: </b>%s\n" \
-                       "<b>Лавэ: </b>%s\n" \
-                       "<b>Выиграно: </b>%s\n" \
-                       "<b>Проиграно: </b>%s\n" \
-                       "\n" \
-                       "<b>Id: </b>%i" % (Name, Lave, Won, Lost, userid)
-            bot.send_message(chatid, profile, parse_mode='HTML')
+                if usstat[0][1] == 'None':
+                    Name = str(usstat[0][0])
+                else:
+                    Name = str(usstat[0][0]) + ' ' + str(usstat[0][1])
+                Lave = makegoodview(usstat[0][2])
+                Won = usstat[0][3]
+                Lost = usstat[0][4]
 
-        else:
-            userid = message.from_user.id
-            cur.execute("SELECT Name, LastName, Money, Won, Lost FROM Users WHERE UserId = %i" % userid)
-            usstat = cur.fetchall()
-            profile = ''
-
-            if usstat[0][1] == 'None':
-                Name = str(usstat[0][0])
-            else:
-                Name = str(usstat[0][0]) + ' ' + str(usstat[0][1])
-            Lave = makegoodview(usstat[0][2])
-            Won = usstat[0][3]
-            Lost = usstat[0][4]
-
-            profile += "<b>Имя: </b>%s\n" \
-                       "<b>Лавэ: </b>%s\n" \
-                       "<b>Выиграно: </b>%s\n" \
-                       "<b>Проиграно: </b>%s\n" \
-                       "\n" \
-                       "<b>Id: </b>%i" % (Name, Lave, Won, Lost, userid)
-            bot.send_message(chatid, profile, parse_mode='HTML')
+                profile += "<b>Имя: </b>%s\n" \
+                           "<b>Лавэ: </b>%s\n" \
+                           "<b>Выиграно: </b>%s\n" \
+                           "<b>Проиграно: </b>%s\n" \
+                           "\n" \
+                           "<b>Id: </b>%i" % (Name, Lave, Won, Lost, userid)
+                bot.send_message(chatid, profile, parse_mode='HTML')
+        except Exception:
+            pass
 
     try:
         if message.text.split()[0] == '!стата' and message.text.lower().split()[1] == "сбросить":
