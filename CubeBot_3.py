@@ -18,7 +18,6 @@ cur = conn.cursor()
 
 
 Money = 0
-cf = 0.16666666666666666666666666666667
 Nums = [1, 2, 3, 4, 5, 6]
 sys.setrecursionlimit(10 ** 2)
 
@@ -1861,7 +1860,7 @@ def endgame(message):
         Names = str(cur.fetchall()[0][0])
 
         #   ВСЕ СТАВКИ
-        Fstat += Names + ' ' + UsBet + ' на ' + UsNum + '\n'
+        Fstat += Names + ' ' + makegoodview(str(UsBet)) + ' на ' + UsNum + '\n'
 
         #   ВЫИГРАЛИ
         if len(UsNum.split('-')) == 2 and int(UsNum.split('-')[0]) <= Number <= int(UsNum.split('-')[1]):
