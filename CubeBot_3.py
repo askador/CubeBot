@@ -166,7 +166,7 @@ def setmoney(message):
 @bot.message_handler(content_types=['text'], regexp='Кости')
 def start_game(message):
     global Game, Shake
-    if len(message.text.split()) == 1 and message.text.lower()[:5] == "кости" or message.text[:6] == '/kosti':
+    if len(message.text.split()) == 1 and message.text.lower() == "кости" or message.text[:6] == '/kosti':
         name = message.from_user.first_name
         lastname = message.from_user.last_name
         username = message.from_user.username
@@ -1035,8 +1035,8 @@ def shake_game(message):
     chatid = message.chat.id
     userid = message.from_user.id
 
-    if len(message.text.split()) == 1 and ''.join(list(message.text.lower())[:2]) == "го" \
-            or ''.join(list(message.text.lower())[:6]) == "трясти" or message.text[:8] == '/tryasti':
+    if len(message.text.split()) == 1 and message.text.lower() == "го" \
+            or message.text.lower() == "трясти" or message.text[:8] == '/tryasti':
 
         #   ВЫГРУЗКА ПАРАМЕТРА GAME
         try:
