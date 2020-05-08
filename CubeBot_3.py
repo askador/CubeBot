@@ -1804,9 +1804,12 @@ def shake(message):
     except Exception:
         pass
 
-    for i in range(len(to_del)):
-        bot.delete_message(chatid, to_del[i])
-    to_del = []
+    try:
+        for i in range(len(to_del)):
+            bot.delete_message(chatid, to_del[i])
+        to_del = []
+    except Exception:
+        pass
 
     text = "[%s](tg://user?id=%i) бросает кубик (5 секунд)" % (name, userid)
     try:
