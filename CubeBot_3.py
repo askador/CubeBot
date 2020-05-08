@@ -1809,14 +1809,19 @@ def shake(message):
     to_del = []
 
     text = "[%s](tg://user?id=%i) бросает кубик (5 секунд)" % (name, userid)
-    mes1 = bot.send_message(chatid, text=text, parse_mode="Markdown")
+    try:
+        mes1 = bot.send_message(chatid, text=text, parse_mode="Markdown")
+    except Exception:
+        pass
 
     time.sleep(5)
     mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
     time.sleep(2)
-    bot.delete_message(chatid, mes1.message_id)
-    bot.delete_message(chatid, mes2.message_id)
-
+    try:
+        bot.delete_message(chatid, mes1.message_id)
+        bot.delete_message(chatid, mes2.message_id)
+    except Exception:
+        pass
     #   РАНДОМНОЕ ЧИСЛО
     algoritm(message)
 
