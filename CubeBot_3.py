@@ -1713,7 +1713,7 @@ def chekbet(message):
                     bet_mes = bot.send_message(chatid, "%s повтор с прошлой игры:\n%s" % (name, PrevBets))
                     to_del.append(bet_mes.message_id)
                 else:
-                    bet_mes = bot.send_message(chatid, "%s некоторые ставки не прошли\n%s" % (name, PrevBets))
+                    bet_mes = bot.send_message(chatid, "%s недостаточно денег\nНекоторые ставки не прошли\n%s" % (name, PrevBets))
                     to_del.append(bet_mes.message_id)
 
         # УДВОЕНИЕ СТАВОК
@@ -1723,11 +1723,16 @@ def chekbet(message):
             cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
             groshi1 = cur.fetchall()[0][0]
 
+            a1 = []
+            b1 = []
+
             if doub:
                 for i in range(len(doub)):
                     Bet1 = doub[i][0]
                     Num1 = doub[i][1]
+                    b1.append(Bet1)
                     if groshi1 >= int(Bet1) * 2:
+                        a1.append(Bet1)
                         cur.execute(
                             "UPDATE USERS SET Name = '%s', LastName = '%s', UserName = '%s' , Money = Money - '%i' "
                             "WHERE UserId = '%i'" % (name, lastname, username, Bet1, userid))
@@ -1737,8 +1742,10 @@ def chekbet(message):
                             "AND Numbers = '%s'" % (Bet1, userid, chatid, Num1))
                         conn.commit()
 
-                bot.send_message(chatid, "%s удвоил все ставки" % name)
-
+                if b1 == a1:
+                    bot.send_message(chatid, "%s удвоил все ставки" % name)
+                else:
+                    bot.send_message(chatid, "%s не хватает денег на некоторые ставки" % name)
     #    ПЕРЕДАТЬ ДЕНЬГИ КОМУ ТО
     if message.text[:2] == '+г' and message.text[2:].split() != []:
         alldataUSERS(name, lastname, username, userid, chatid)
