@@ -18,8 +18,6 @@ conn = psycopg2.connect("postgres://widffjyseacqgd:9e0aba3ec9eff3396d1f1c12998e6
 conn.set_client_encoding("UTF8")
 cur = conn.cursor()
 
-cur.execute("UPDATE USERS set WON = 0, LOST = 0")
-conn.commit()
 
 Money = 0
 Nums = [1, 2, 3, 4, 5, 6]
@@ -205,7 +203,7 @@ def start_game(message):
                 conn.commit()
 
             game(message)
-            task1 = threading.Thread(target=stopgame(message))
+            #task1 = threading.Thread(target=stopgame(message))
 
         #   ПРОВЕРКА МОЖНО БРОСАТЬ КУБИКИ
         try:
@@ -1492,7 +1490,7 @@ def chekbet(message):
 
             except Exception:
                 conn.rollback()
-                pass
+
 
         # ЕСЛИ ЗАПИСЬ 100 2-4
         if len(text.split()) == 2:
@@ -2053,6 +2051,7 @@ def endgame(message):
     bot.send_message(chatid, "🎲  %i\nСтавки:\n%s \n%s" % (Number, Fstat, WINstat), parse_mode='HTML')
 
 
+'''
 #   По таймеру 300 секунд после запуска
 def stopgame(message):
     global startmes, bul
@@ -2089,7 +2088,7 @@ def stopgame(message):
         conn.commit()
 
         bul = False
-
+'''
 
 
 def algoritm(message):
