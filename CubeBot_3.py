@@ -2058,7 +2058,7 @@ def endgame(message):
 def stopgame(message):
     global startmes, bul
     chatid = message.chat.id
-    time.sleep(20)
+    time.sleep(300)
     if bul is False:
         bul = True
 
