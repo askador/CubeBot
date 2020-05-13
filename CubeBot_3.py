@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 import numpy as np
 import sys
+import threading
 
 token = '996503468:AAFA1AHH7rlHJ_u0YXBJuKYCbxoXfMPrEdY'
 
@@ -204,6 +205,8 @@ def start_game(message):
                 conn.commit()
 
             game(message)
+            task1 = threading.Thread(target=stopgame(message))
+            task1.start()
 
         #   ПРОВЕРКА МОЖНО БРОСАТЬ КУБИКИ
         try:
@@ -1031,13 +1034,11 @@ def inl(c):
 
 
 bul = False
-
-
 @bot.message_handler(commands=['tryasti'])
 @bot.message_handler(content_types=['text'], regexp='Трясти')
 @bot.message_handler(content_types=['text'], regexp='Го')
 def shake_game(message):
-    global Game, Shake, bul, checkgame
+    global Game, Shake, bul
     chatid = message.chat.id
     userid = message.from_user.id
 
@@ -1069,7 +1070,6 @@ def shake_game(message):
         if Game is True and Shake is True:
             if bul is False:
                 bul = True
-                checkgame = False
                 shake(message)
                 bul = False
 
@@ -1372,7 +1372,7 @@ def statuser(message):
             pass
 
     try:
-        if message.text.split()[0] == '!стата' and message.text.lower().split()[1] == "сбросить":
+        if message.text.lower().split()[0] == '!стата' and message.text.lower().split()[1] == "сбросить":
             userid = message.from_user.id
             cur.execute("UPDATE USERS set WON = 0, LOST = 0 WHERE UserId = %i" % userid)
             conn.commit()
@@ -1381,8 +1381,8 @@ def statuser(message):
         pass
 
     try:
-        if message.text.split()[0] == '!стата' and isinstance(int(message.text.lower().split()[1]), int) is True:
-            userid = message.text.lower().split()[2]
+        if message.text.lower().split()[0] == '!стата' and isinstance(int(message.text.lower().split()[1]), int) is True:
+            userid = message.text.split()[1]
             cur.execute("UPDATE USERS set WON = 0, LOST = 0 WHERE UserId = %i" % userid)
             conn.commit()
         bot.send_message(chatid, "Стата сброшена")
@@ -1401,7 +1401,7 @@ def advice(message):
 #  ПРИНЯТИЕ СТАВОК
 @bot.message_handler(content_types=['text'])
 def chekbet(message):
-    global cur, conn, bet, num, Game, checkgame, to_del
+    global cur, conn, bet, num, Game, to_del
     name = message.from_user.first_name
     lastname = message.from_user.last_name
     username = message.from_user.username
@@ -1928,7 +1928,7 @@ def shake(message):
 
     time.sleep(5)
     mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
-    time.sleep(2)
+    time.sleep(4)
 
     try:
         bot.delete_message(chatid, mes1.message_id)
@@ -2022,28 +2022,28 @@ def endgame(message):
 
         #   LOST
         try:
-            if int(UsNum) != Number:
+            if int(UsNum) != Number or int(UsNum.split('-')[1]) < Number or Number <= int(UsNum.split('-')[0]):
                 Lose += 1
                 cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
                 conn.commit()
         except Exception:
             pass
 
-        try:
-            if int(UsNum.split('-')[1]) < Number:
-                Lose += 1
-                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
-                conn.commit()
-        except Exception:
-            pass
-
-        try:
-            if Number <= int(UsNum.split('-')[0]):
-                Lose += 1
-                cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
-                conn.commit()
-        except Exception:
-            pass
+        # try:
+        #     if int(UsNum.split('-')[1]) < Number:
+        #         Lose += 1
+        #         cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
+        #         conn.commit()
+        # except Exception:
+        #     pass
+        #
+        # try:
+        #     if Number <= int(UsNum.split('-')[0]):
+        #         Lose += 1
+        #         cur.execute("UPDATE USERS set LOST = LOST + %i WHERE UserId = %i" % (int(UsBet), UsId))
+        #         conn.commit()
+        # except Exception:
+        #     pass
 
     #   UPDATE STATSLOG
     cur.execute("UPDATE STATS set WON = WON + %i, LOST = LOST + %i, PLAYS = PLAYS + 1 WHERE Id = 1" % (ALLwins, Lose))
@@ -2052,6 +2052,45 @@ def endgame(message):
         WINstat = 'Вах, никто нэ выиграл'
 
     bot.send_message(chatid, "🎲  %i\nСтавки:\n%s \n%s" % (Number, Fstat, WINstat), parse_mode='HTML')
+
+
+#   По таймеру 300 секунд после запуска
+def stopgame(message):
+    global startmes, bul
+    chatid = message.chat.id
+    time.sleep(20)
+    if bul is False:
+        bul = True
+
+        try:
+            bot.delete_message(chatid, startmes.message_id)
+        except Exception:
+            pass
+
+        mes2 = bot.send_document(message.chat.id, data=random.choice(Gifs))
+        time.sleep(4)
+        try:
+            bot.delete_message(chatid, mes2.message_id)
+        except Exception:
+            pass
+
+        algoritm(message)
+
+        endgame(message)
+
+        #   STOP GAME
+        cur.execute("UPDATE GAME set Game = False WHERE IDChat = %i" % chatid)
+        conn.commit()
+
+        #   STOP SHAKE
+        cur.execute("UPDATE GAME set Shake = False WHERE IDChat = %i" % chatid)
+        conn.commit()
+
+        cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
+        conn.commit()
+
+        bul = False
+
 
 
 def algoritm(message):
