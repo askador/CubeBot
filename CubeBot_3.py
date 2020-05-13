@@ -206,7 +206,6 @@ def start_game(message):
 
             game(message)
             task1 = threading.Thread(target=stopgame(message))
-            task1.start()
 
         #   ПРОВЕРКА МОЖНО БРОСАТЬ КУБИКИ
         try:
