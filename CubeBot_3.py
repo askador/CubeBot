@@ -202,6 +202,8 @@ def start_game(message):
                 conn.commit()
 
             game(message)
+            timer = threading.Timer(300.0, stopgame)
+            timer.start()
 
             # timer = threading.Timer(300.0, stopgame)
             # timer.start()
@@ -1381,7 +1383,7 @@ def statuser(message):
         pass
 
     try:
-        if message.text.lower().split()[0] == '!стата' and isinstance(int(message.text.lower().split()[1]),
+        if message.text.lower().split()[0] == '!стата' and isinstance(int(message.text.split()[1]),
                                                                       int) is True:
             userid = message.text.split()[1]
             cur.execute("UPDATE USERS set WON = 0, LOST = 0 WHERE UserId = %i" % userid)
@@ -2042,7 +2044,6 @@ def endgame(chatid):
 
 
 #   По таймеру 300 секунд после запуска
-'''
 def stopgame(chatid):
     global startmes, bul
     time.sleep(300)
@@ -2077,7 +2078,7 @@ def stopgame(chatid):
         conn.commit()
 
         bul = False
-'''
+
 
 
 def algoritm(chatid):
