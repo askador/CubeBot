@@ -2046,7 +2046,6 @@ def endgame(chatid):
 #   По таймеру 300 секунд после запуска
 def stopgame(chatid):
     global startmes, bul
-    time.sleep(300)
     if bul is False:
         bul = True
 
@@ -2055,15 +2054,10 @@ def stopgame(chatid):
         except Exception:
             pass
 
-        mes2 = bot.send_document(chatid, data=random.choice(Gifs))
-        time.sleep(4)
-        try:
-            bot.delete_message(chatid, mes2.message_id)
-        except Exception:
-            pass
 
         algoritm(chatid)
 
+        time.sleep(4)
         endgame(chatid)
 
         #   STOP GAME
@@ -2076,6 +2070,7 @@ def stopgame(chatid):
 
         cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
         conn.commit()
+
 
         bul = False
 
