@@ -202,7 +202,7 @@ def start_game(message):
                 conn.commit()
 
             game(message)
-            timer = threading.Timer(300.0, stopgame)
+            timer = threading.Timer(300.0, stopgame, args=[chatid])
             timer.start()
 
             # timer = threading.Timer(300.0, stopgame)
