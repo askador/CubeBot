@@ -202,11 +202,8 @@ def start_game(message):
                 conn.commit()
 
             game(message)
-            timer = threading.Timer(300.0, stopgame, args=[chatid])
-            timer.start()
 
-            # timer = threading.Timer(300.0, stopgame)
-            # timer.start()
+
 
         #   ПРОВЕРКА МОЖНО БРОСАТЬ КУБИКИ
         try:
@@ -2042,37 +2039,6 @@ def endgame(chatid):
 
     bot.send_message(chatid, "🎲  %i\nСтавки:\n%s \n%s" % (Number, Fstat, WINstat), parse_mode='HTML')
 
-
-#   По таймеру 300 секунд после запуска
-def stopgame(chatid):
-    global startmes, bul
-    if bul is False:
-        bul = True
-
-        try:
-            bot.delete_message(chatid, startmes.message_id)
-        except Exception:
-            pass
-
-
-        algoritm(chatid)
-
-        time.sleep(4)
-        endgame(chatid)
-
-        #   STOP GAME
-        cur.execute("UPDATE GAME set Game = False WHERE IDChat = %i" % chatid)
-        conn.commit()
-
-        #   STOP SHAKE
-        cur.execute("UPDATE GAME set Shake = False WHERE IDChat = %i" % chatid)
-        conn.commit()
-
-        cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
-        conn.commit()
-
-
-        bul = False
 
 
 
