@@ -164,11 +164,11 @@ def setmoney(message):
 
 #
 #
-
+to_del = []
 @bot.message_handler(commands=['kosti'])
 @bot.message_handler(content_types=['text'], regexp='Кости')
 def start_game(message):
-    global Game, Shake
+    global Game, Shake, to_del
     if len(message.text.split()) == 1 and message.text.lower() == "кости" or message.text[:6] == '/kosti':
         name = message.from_user.first_name
         lastname = message.from_user.last_name
@@ -202,8 +202,8 @@ def start_game(message):
 
             game(message)
         else:
-            bot.send_message(chatid, "Игра уже запущена")
-
+            mes3 = bot.send_message(chatid, "Игра уже запущена")
+            to_del.append(mes3)
 
 
         #   ПРОВЕРКА МОЖНО БРОСАТЬ КУБИКИ
@@ -217,7 +217,6 @@ def start_game(message):
 
 
 bonnums = []
-to_del = []
 
 
 @bot.callback_query_handler(func=lambda c: True)
