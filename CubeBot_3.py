@@ -6,10 +6,9 @@ import time
 from datetime import datetime
 import numpy as np
 import sys
-import threading
 
-token = '996503468:AAFA1AHH7rlHJ_u0YXBJuKYCbxoXfMPrEdY'
 
+token = '996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo'
 bot = telebot.TeleBot(token)
 
 conn = psycopg2.connect("postgres://widffjyseacqgd:9e0aba3ec9eff3396d1f1c12998e638343e7d1666f17995b2d77e31e6a55c99d"
