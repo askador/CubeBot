@@ -201,6 +201,8 @@ def start_game(message):
                 conn.commit()
 
             game(message)
+        else:
+            bot.send_message(chatid, "Игра уже запущена")
 
 
 
