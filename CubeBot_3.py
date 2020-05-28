@@ -364,6 +364,7 @@ async def usermoney(message):
         mon = cur.fetchall()[0][0]
         await message.reply("%s грывень" % makegoodview(mon))
     except Exception as e:
+        print(e)
         await message.reply("Oops. something went wrong. Try again.")
 
 
@@ -399,7 +400,7 @@ async def bonus(message):
     lastname = message.from_user.last_name
     await alldataUSERS(name, lastname, username, bonuserid, chatid)
 
-    cur.execute("SELECT BONUSTIME FROM USERS WHERE UserId = %i" % bonuserid)
+    cur.execute("SELECT BONUSTIME FROM USERS WHERE UserId = %s" % bonuserid)
     bonustime = int(cur.fetchall()[0][0])
 
     ostalos = bonustime - message.date.timestamp()
@@ -552,6 +553,18 @@ async def top(message):
             await message.answer(topchik)
         except Exception as e:
             message.reply("Oops, something went wrong")
+
+
+@dp.message_handler(regexp='!раздача ([0-9]+)')
+async def giveaway(message):
+    if int(message.date.timestamp()) < time_for_giveaway:
+        if message.text.split()[1] > 0:
+            if message.text.split()[1] <= 10**9:
+                pass
+            else:
+                await message.reply("Раздать можно не больше 1 миллиарда")
+    else:
+        message.reply("Устраивать раздачу можно раз в 60 минут")
 
 
 async def trottled(callback_query, *args, **kwargs):
