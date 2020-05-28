@@ -364,7 +364,6 @@ async def usermoney(message):
         mon = cur.fetchall()[0][0]
         await message.reply("%s грывень" % makegoodview(mon))
     except Exception as e:
-        print(e)
         await message.reply("Oops. something went wrong. Try again.")
 
 
@@ -400,41 +399,44 @@ async def bonus(message):
     lastname = message.from_user.last_name
     await alldataUSERS(name, lastname, username, bonuserid, chatid)
 
-    cur.execute("SELECT BONUSTIME FROM USERS WHERE UserId = %s" % bonuserid)
-    bonustime = int(cur.fetchall()[0][0])
+    try:
+        cur.execute("SELECT BONUSTIME FROM USERS WHERE UserId = %s" % bonuserid)
+        bonustime = int(cur.fetchall()[0][0])
+    except Exception:
+        await message.reply("Oops, something went wrong")
+    else:
+        ostalos = bonustime - message.date.timestamp()
 
-    ostalos = bonustime - message.date.timestamp()
+        if bonuserid != 526497876 and bonuserid != 547400918 and ostalos > 0:
+            value = datetime.datetime.fromtimestamp(ostalos).strftime('%H:%M:%S')
+            await message.reply("Бонусное лавэ можно получить через %s" % value)
 
-    if bonuserid != 526497876 and bonuserid != 547400918 and ostalos > 0:
-        value = datetime.datetime.fromtimestamp(ostalos).strftime('%H:%M:%S')
-        await message.reply("Бонусное лавэ можно получить через %s" % value)
+        elif bonuserid == 526497876 or bonuserid == 547400918 or bonustime == 0 or ostalos <= 0:
+            keybonus = types.InlineKeyboardMarkup()
+            bonusik = types.InlineKeyboardButton(text='Бросить', callback_data="Бросить")
+            keybonus.add(bonusik)
 
-    elif bonuserid == 526497876 or bonuserid == 547400918 or bonustime == 0 or ostalos <= 0:
-        keybonus = types.InlineKeyboardMarkup()
-        bonusik = types.InlineKeyboardButton(text='Бросить', callback_data="Бросить")
-        keybonus.add(bonusik)
+            lavebonus = int(random.randrange(400, 800))
 
-        lavebonus = int(random.randrange(400, 800))
+            numbonus = ''.join([str(np.random.randint(1, 7, 1)[0]) for i in range(3)])
 
-        numbonus = ''.join([str(np.random.randint(1, 7, 1)[0]) for i in range(3)])
+            cur.execute("DELETE FROM BONUS WHERE USERID = %s" % bonuserid)
+            conn.commit()
 
-        cur.execute("DELETE FROM BONUS WHERE USERID = %s" % bonuserid)
-        conn.commit()
+            cur.execute(
+                "INSERT INTO BONUS (UserId, BONCOEF, BONNUMS, LAVE, START_LAVE) VALUES (%i, 1, %s, %i, %i)"
+                % (bonuserid, numbonus, lavebonus, lavebonus))
+            conn.commit()
 
-        cur.execute(
-            "INSERT INTO BONUS (UserId, BONCOEF, BONNUMS, LAVE, START_LAVE) VALUES (%i, 1, %s, %i, %i)"
-            % (bonuserid, numbonus, lavebonus, lavebonus))
-        conn.commit()
+            bonusmes = await message.answer("<a href='tg://user?id=%i'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                            "Лавэ %i, коеффициент = 1.0\n\n"
+                                            "           🎲 : 🎲 : 🎲 \n" % (bonuserid, name, lavebonus),
+                                            reply_markup=keybonus)
 
-        bonusmes = await message.answer("<a href='tg://user?id=%i'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                        "Лавэ %i, коеффициент = 1.0\n\n"
-                                        "           🎲 : 🎲 : 🎲 \n" % (bonuserid, name, lavebonus),
-                                        reply_markup=keybonus)
-
-        punkt = int(message.date.timestamp()) + 7200
-        cur.execute("UPDATE USERS set BONUSTIME = %i, Bonus_mes_id = '%i' WHERE UserId = %i" %
-                    (punkt, bonusmes.message_id, bonuserid))
-        conn.commit()
+            punkt = int(message.date.timestamp()) + 7200
+            cur.execute("UPDATE USERS set BONUSTIME = %i, Bonus_mes_id = '%i' WHERE UserId = %i" %
+                        (punkt, bonusmes.message_id, bonuserid))
+            conn.commit()
 
 
 #  users stats
@@ -554,17 +556,6 @@ async def top(message):
         except Exception as e:
             message.reply("Oops, something went wrong")
 
-
-@dp.message_handler(regexp='!раздача ([0-9]+)')
-async def giveaway(message):
-    if int(message.date.timestamp()) < time_for_giveaway:
-        if message.text.split()[1] > 0:
-            if message.text.split()[1] <= 10**9:
-                pass
-            else:
-                await message.reply("Раздать можно не больше 1 миллиарда")
-    else:
-        message.reply("Устраивать раздачу можно раз в 60 минут")
 
 
 async def trottled(callback_query, *args, **kwargs):
