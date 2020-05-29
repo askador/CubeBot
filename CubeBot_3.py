@@ -82,13 +82,13 @@ async def rules_for_player(message):
                              " 100 на 5 | 50 2\n"
                              "20 на 1-3 | 30 5-6")
     else:
-        message.reply("Используйте эту команду в личке с ботом")
+        await message.reply("Используйте эту команду в личке с ботом")
 
 
 @dp.message_handler(commands=['help'])
 async def help_for_player(message):
     if message.from_user.id == message.chat.id:
-        message.answer("<b>Игровые команды:</b>\n\n"
+        await message.answer("<b>Игровые команды:</b>\n\n"
                        "<b>Кости</b> - запустить игру\n"
                        "<b>Трясти</b> - бросить кубик\n"
                        "<b>Отмена</b> - отмена ставок\n"
@@ -106,7 +106,7 @@ async def help_for_player(message):
                        "<a href='tg://user?id=526497876'><b>Серый</b></a> и "
                        "<a href='tg://user?id=547400918'><b>Миша</b></a>")
     else:
-        message.reply("Используйте эту команду в личке с ботом")
+        await message.reply("Используйте эту команду в личке с ботом")
 
 
 @dp.message_handler(commands=['statslog'])
@@ -911,7 +911,7 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     bonusik = types.InlineKeyboardButton(text='Бросить', callback_data="финал")
     keybonus2.add(bonusik)
 
-    cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % userid)
+    cur.execute("SELECT Bonus_mes_id FROM USERS WHERE UserId = %i" % userid)
     bonususermes = cur.fetchall()[0][0]
 
     if bonususermes == mesid:
