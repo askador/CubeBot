@@ -640,44 +640,46 @@ async def top(message):
 async def giveaway_timer(give_mes_id, userid, chatid):
     start_in = 300
     while start_in > 0:
-        await asyncio.sleep(2)
-        start_in -= 2
+        await asyncio.sleep(3)
+        start_in -= 3
+        try:
+            conn = psycopg2.connect(
+                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+            cur = conn.cursor()
+            cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+            how_many_proc = int(cur.fetchall()[0][0])
 
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
-        cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
-        how_many_proc = int(cur.fetchall()[0][0])
+            cur.execute(f"SELECT FullName FROM GIVEAWAY%s WHERE UserId = %s" % (abs(chatid), userid))
+            starter = str(cur.fetchall()[0][0])
 
-        cur.execute(f"SELECT FullName FROM GIVEAWAY%s WHERE UserId = %s" % (abs(chatid), userid))
-        starter = str(cur.fetchall()[0][0])
+            cur.execute(f"SELECT FullName, Value FROM GIVEAWAY{abs(chatid)}"
+                        f" WHERE Value IS NOT NULL ORDER BY VALUE DESC")
+            giveaway_data = cur.fetchall()
+            conn.close()
+            list_for_giveaway = ''
 
-        cur.execute(f"SELECT FullName, Value FROM GIVEAWAY{abs(chatid)}"
-                    f" WHERE Value IS NOT NULL")
-        giveaway_data = cur.fetchall()
-        conn.close()
-        list_for_giveaway = ''
+            for i in range(len(giveaway_data)):
+                FullName = str(giveaway_data[i][0])
+                Value = str(giveaway_data[i][1])
+                list_for_giveaway += FullName + ' ' + Value + '🏅\n'
 
-        for i in range(len(giveaway_data)):
-            FullName = str(giveaway_data[i][0])
-            Value = str(giveaway_data[i][1])
-            list_for_giveaway += FullName + ' ' + Value + '🏅\n'
+            giveaway_bt_procc = types.InlineKeyboardMarkup()
+            button = types.InlineKeyboardButton(text='+ 1🏅', callback_data="раздача")
+            giveaway_bt_procc.add(button)
 
-        giveaway_bt_procc = types.InlineKeyboardMarkup()
-        button = types.InlineKeyboardButton(text='+ 1🏅', callback_data="раздача")
-        giveaway_bt_procc.add(button)
-
-        await bot.edit_message_text(chat_id=chatid, message_id=give_mes_id, text=
-                                    f"<a href='tg://user?id={userid}'> {starter}</a> "
-                                    f"устраивает раздачу лавэ {how_many_proc}\n"
-                                    f"Правила:\n"
-                                    f"Нажимайте на кнопку, набирайте больше всех очков\n"
-                                    f"Награда распределиться по количеству набранных очков\n"
-                                    f"Раздача лавэ через {datetime.datetime.fromtimestamp(start_in).strftime('%M:%S')}"
-                                    f"\n\n"
-                                    f"{list_for_giveaway}",
-                                    reply_markup=giveaway_bt_procc)
+            await bot.edit_message_text(chat_id=chatid, message_id=give_mes_id, text=
+                                        f"<a href='tg://user?id={userid}'> {starter}</a> "
+                                        f"устраивает раздачу лавэ {how_many_proc}\n"
+                                        f"Правила:\n"
+                                        f"Нажимайте на кнопку, набирайте больше всех очков\n"
+                                        f"Награда распределиться по количеству набранных очков\n"
+                                        f"Раздача лавэ через {datetime.datetime.fromtimestamp(start_in).strftime('%M:%S')}"
+                                        f"\n\n"
+                                        f"{list_for_giveaway}",
+                                        reply_markup=giveaway_bt_procc)
+        except Exception:
+            pass
     else:
         pass
         await bot.delete_message(chatid, give_mes_id)
@@ -689,7 +691,6 @@ async def giveaway_timer(give_mes_id, userid, chatid):
         cur = conn.cursor()
         cur.execute(f"SELECT FullName, Value, UserId FROM GIVEAWAY{abs(chatid)} WHERE Value > 0")
         final = cur.fetchall()
-        print(final)
         if final:
             final_list = ''
             all_values = 0
@@ -725,7 +726,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
 
 
 @dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')
-@dp.throttled(rate=1)
+@dp.throttled(rate=1.5)
 async def scores(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
     userid = callback_query.from_user.id
@@ -734,27 +735,30 @@ async def scores(callback_query: types.CallbackQuery):
     lastname = callback_query.from_user.last_name
     username = callback_query.from_user.username
 
-    conn = psycopg2.connect(
-        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-    cur = conn.cursor()
-    cur.execute(f"SELECT UserId FROM GIVEAWAY{abs(chatid)} WHERE How_many IS NOT NULL")
-    not_for_him = cur.fetchall()[0][0]
-    if userid != not_for_him:
-        await alldataUSERS(name1, lastname, username, userid, chatid)
-        cur.execute(f"SELECT count(Value) FROM GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
-        to_count = int(cur.fetchall()[0][0])
-        if to_count == 1:
-            cur.execute(f"UPDATE GIVEAWAY{abs(chatid)} set Value = Value + 1 WHERE UserId = {userid}")
-            conn.commit()
-        elif to_count < 1:
-            cur.execute(f"INSERT INTO GIVEAWAY{abs(chatid)} (FullName, UserId, Value)"
-                        f" VALUES ('{name}', {userid}, 1)")
-            conn.commit()
-        await bot.answer_callback_query(callback_query.id)
-    else:
-        await bot.answer_callback_query(callback_query.id, "Ты организатор")
-    conn.close()
+    try:
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
+        cur.execute(f"SELECT UserId FROM GIVEAWAY{abs(chatid)} WHERE How_many IS NOT NULL")
+        not_for_him = cur.fetchall()[0][0]
+        if userid != not_for_him:
+            await alldataUSERS(name1, lastname, username, userid, chatid)
+            cur.execute(f"SELECT count(Value) FROM GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+            to_count = int(cur.fetchall()[0][0])
+            if to_count == 1:
+                cur.execute(f"UPDATE GIVEAWAY{abs(chatid)} set Value = Value + 1 WHERE UserId = {userid}")
+                conn.commit()
+            elif to_count < 1:
+                cur.execute(f"INSERT INTO GIVEAWAY{abs(chatid)} (FullName, UserId, Value)"
+                            f" VALUES ('{name}', {userid}, 1)")
+                conn.commit()
+            await bot.answer_callback_query(callback_query.id)
+        else:
+            await bot.answer_callback_query(callback_query.id, "Ты организатор")
+        conn.close()
+    except Exception:
+        pass
 
 
 
@@ -826,7 +830,7 @@ async def giveaway(message):
         else:
             await message.reply("Минимальная сумма для раздачи 100 000")
     else:
-        await message.reply("Устраивайте раздачу лавэ в чатах")
+        await message.reply("Устраивайте раздачу лавэ в группах")
 
 
 async def trottled(callback_query, *args, **kwargs):
