@@ -1564,7 +1564,7 @@ async def alldataUSERS(name, lastname, username, userid, chatid):
         if UserdIds < 1:
             cur.execute("INSERT INTO USERS (Name, LastName, UserName, UserId, Money, Bonustime, "
                         "Lost, Won, Bonus_mes_id) "
-                        f"VALUES ({name},{lastname},{username},{userid}, 5000, 0, 0, 0, Null)")
+                        f"VALUES ('{name}','{lastname}','{username}','{userid}', 5000, 0, 0, 0, Null)")
         if UserdIds > 1:
             cur.execute("DELETE FROM USERS WHERE Id = (SELECT MAX(ID) FROM USERS WHERE USERID = '%i')" % userid)
     except Exception as e:
