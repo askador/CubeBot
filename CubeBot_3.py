@@ -12,8 +12,6 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 
-
-
 Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ',
         'CgACAgQAAxkBAAIYLl6jKaIkGk1Evh4-e8Xy6wQyux-DAAJaAgACb7ntUutpUszjF0COGQQ',
         'CgACAgIAAxkBAAIYL16jKabyMhMqejWNaXKYnD9ejG6JAAJiBAACn94RSMkn7AO4qNgMGQQ',
@@ -670,7 +668,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
 
             await bot.edit_message_text(chat_id=chatid, message_id=give_mes_id, text=
                                         f"<a href='tg://user?id={userid}'> {starter}</a> "
-                                        f"устраивает раздачу лавэ {how_many_proc}\n"
+                                        f"устраивает раздачу лавэ {makegoodview(how_many_proc)}\n"
                                         f"Правила:\n"
                                         f"Нажимайте на кнопку, набирайте больше всех очков\n"
                                         f"Награда распределится по количеству набранных очков\n"
@@ -707,7 +705,8 @@ async def giveaway_timer(give_mes_id, userid, chatid):
 
                 money = int(int(how_many / all_values) * users_score)
 
-                final_list += "<a href='tg://user?id=%i'>%s</a>" % (final[j][2], fullname) + ' получил ' + str(money) + '\n'
+                final_list += "<a href='tg://user?id=%i'>%s</a>" % (final[j][2], fullname) + ' получил ' + \
+                              str(makegoodview(money)) + '\n'
 
                 cur.execute(f"UPDATE USERS SET Money = Money + {money} WHERE UserId = {final[j][2]}")
                 conn.commit()
@@ -715,6 +714,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             await bot.send_message(chatid, "Итоги:\n\n" + final_list)
 
             cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
+            conn.commit()
         else:
             cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
             how_many_back = int(cur.fetchall()[0][0])
@@ -722,6 +722,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             cur.execute(f"UPDATE USERS Set Money = Money + {how_many_back} WHERE UserId = {userid}")
             await bot.send_message(chatid, "Раздача не состоялась, некому раздавать лавэ")
             cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
+            conn.commit()
         conn.close()
 
 
@@ -775,7 +776,7 @@ async def giveaway(message):
             cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
             time_for_giveaway = int(cur.fetchall()[0][0])
             conn.close()
-            if int(message.date.timestamp()) < time_for_giveaway or time_for_giveaway == 0:
+            if int(message.date.timestamp()) < time_for_giveaway or time_for_giveaway == 0 or userid != 526497876:
                 if int(message.text.split()[1]) <= 10**9:
                     name = str(message.from_user.full_name)
                     how_many = int(message.text.split()[1])
@@ -813,7 +814,7 @@ async def giveaway(message):
                         giveaway_bt.add(button)
 
                         giveaway_mes = await message.answer(f"<a href='tg://user?id={userid}'>{name}</a> "
-                                                            f"устраивает раздачу лавэ {how_many}\n"
+                                                            f"устраивает раздачу лавэ {makegoodview(how_many)}\n"
                                                             f"Правила:\n"
                                                             f"Нажимайте на кнопку, набирайте больше всех очков\n"
                                                             f"Награда распределится по количеству набранных очков\n"
