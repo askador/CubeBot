@@ -163,8 +163,13 @@ async def setmoney(message):
         try:
             if howmch[0] == '+':
                 if 0 < int(howmch) < 10 ** 18:
+                    conn = psycopg2.connect(
+                        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+                        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+                    cur = conn.cursor()
                     cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (int(howmch[1:]), int(towho)))
                     conn.commit()
+                    conn.close()
                     await bot.send_message(papaid, "ADDed")
                     await bot.send_message(towho, "Бонус %s💰" % makegoodview(howmch[1:]))
                 else:
@@ -631,6 +636,197 @@ async def top(message):
         except Exception as e:
             message.reply("Oops, something went wrong")
 
+
+async def giveaway_timer(give_mes_id, userid, chatid):
+    start_in = 300
+    while start_in > 0:
+        await asyncio.sleep(2)
+        start_in -= 2
+
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
+        cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+        how_many_proc = int(cur.fetchall()[0][0])
+
+        cur.execute(f"SELECT FullName FROM GIVEAWAY%s WHERE UserId = %s" % (abs(chatid), userid))
+        starter = str(cur.fetchall()[0][0])
+
+        cur.execute(f"SELECT FullName, Value FROM GIVEAWAY{abs(chatid)}"
+                    f" WHERE Value IS NOT NULL")
+        giveaway_data = cur.fetchall()
+        conn.close()
+        list_for_giveaway = ''
+
+        for i in range(len(giveaway_data)):
+            FullName = str(giveaway_data[i][0])
+            Value = str(giveaway_data[i][1])
+            list_for_giveaway += FullName + ' ' + Value + '🏅\n'
+
+        giveaway_bt_procc = types.InlineKeyboardMarkup()
+        button = types.InlineKeyboardButton(text='+ 1🏅', callback_data="раздача")
+        giveaway_bt_procc.add(button)
+
+        await bot.edit_message_text(chat_id=chatid, message_id=give_mes_id, text=
+                                    f"<a href='tg://user?id={userid}'> {starter}</a> "
+                                    f"устраивает раздачу лавэ {how_many_proc}\n"
+                                    f"Правила:\n"
+                                    f"Нажимайте на кнопку, набирайте больше всех очков\n"
+                                    f"Награда распределиться по количеству набранных очков\n"
+                                    f"Раздача лавэ через {datetime.datetime.fromtimestamp(start_in).strftime('%M:%S')}"
+                                    f"\n\n"
+                                    f"{list_for_giveaway}",
+                                    reply_markup=giveaway_bt_procc)
+    else:
+        pass
+        await bot.delete_message(chatid, give_mes_id)
+
+        await asyncio.sleep(2)
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
+        cur.execute(f"SELECT FullName, Value, UserId FROM GIVEAWAY{abs(chatid)} WHERE Value > 0")
+        final = cur.fetchall()
+        print(final)
+        if final:
+            final_list = ''
+            all_values = 0
+
+            for i in range(len(final)):
+                all_values += int(final[i][1])
+
+            cur.execute(f"SELECT how_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+            how_many = int(cur.fetchall()[0][0])
+
+            for j in range(len(final)):
+                users_score = int(final[j][1])
+                fullname = str(final[j][0])
+
+                money = int(int(how_many / all_values) * users_score)
+
+                final_list += "<a href='tg://user?id=%i'>%s</a>" % (final[j][2], fullname) + ' получил ' + str(money) + '\n'
+
+                cur.execute(f"UPDATE USERS SET Money = Money + {money} WHERE UserId = {final[j][2]}")
+                conn.commit()
+
+            await bot.send_message(chatid, "Итоги:\n\n" + final_list)
+
+            cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
+        else:
+            cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+            how_many_back = int(cur.fetchall()[0][0])
+
+            cur.execute(f"UPDATE USERS Set Money = Money + {how_many_back} WHERE UserId = {userid}")
+            await bot.send_message(chatid, "Раздача не состоялась, некому раздавать лавэ")
+            cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
+        conn.close()
+
+
+@dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')
+@dp.throttled(rate=1)
+async def scores(callback_query: types.CallbackQuery):
+    chatid = callback_query.message.chat.id
+    userid = callback_query.from_user.id
+    name = callback_query.from_user.full_name
+    name1 = callback_query.from_user.first_name
+    lastname = callback_query.from_user.last_name
+    username = callback_query.from_user.username
+
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
+    cur.execute(f"SELECT UserId FROM GIVEAWAY{abs(chatid)} WHERE How_many IS NOT NULL")
+    not_for_him = cur.fetchall()[0][0]
+    if userid != not_for_him:
+        await alldataUSERS(name1, lastname, username, userid, chatid)
+        cur.execute(f"SELECT count(Value) FROM GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+        to_count = int(cur.fetchall()[0][0])
+        if to_count == 1:
+            cur.execute(f"UPDATE GIVEAWAY{abs(chatid)} set Value = Value + 1 WHERE UserId = {userid}")
+            conn.commit()
+        elif to_count < 1:
+            cur.execute(f"INSERT INTO GIVEAWAY{abs(chatid)} (FullName, UserId, Value)"
+                        f" VALUES ('{name}', {userid}, 1)")
+            conn.commit()
+        await bot.answer_callback_query(callback_query.id)
+    else:
+        await bot.answer_callback_query(callback_query.id, "Ты организатор")
+    conn.close()
+
+
+
+@dp.message_handler(regexp='!раздача ([0-9]+)')
+async def giveaway(message):
+    userid = message.from_user.id
+    chatid = message.chat.id
+    if userid != chatid:
+        if int(message.text.split()[1]) >= 100000:
+            conn = psycopg2.connect(
+                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+            cur = conn.cursor()
+            cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
+            time_for_giveaway = int(cur.fetchall()[0][0])
+            conn.close()
+            if int(message.date.timestamp()) < time_for_giveaway or time_for_giveaway == 0:
+                if int(message.text.split()[1]) <= 10**9:
+                    name = str(message.from_user.full_name)
+                    how_many = int(message.text.split()[1])
+
+                    try:
+                        conn = psycopg2.connect(
+                            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+                            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+                        cur = conn.cursor()
+                        cur.execute(f"CREATE TABLE GIVEAWAY{abs(chatid)}("
+                                    "Id Serial,"
+                                    "UserId              BIGINT,"
+                                    "How_many               INT,"
+                                    "FullName              TEXT,"
+                                    "value                  INT,"
+                                    "PRIMARY KEY(Id))")
+                    except Exception as e:
+                        conn.close()
+                        await message.reply("Раздача лавэ уже начата")
+                    else:
+                        conn.commit()
+
+                        cur.execute(f"INSERT INTO GIVEAWAY{abs(chatid)} (UserId, How_many, FullName)"
+                                    f" Values ('{userid}', '{how_many}', '%s')" % name)
+                        conn.commit()
+
+                        cur.execute(f"UPDATE USERS SET Giveaway_time = '{int(message.date.timestamp()) + 3600}', "
+                                    f"Money = Money - {how_many} "
+                                    f"WHERE UserId = {userid}")
+                        conn.commit()
+                        conn.close()
+
+                        giveaway_bt = types.InlineKeyboardMarkup()
+                        button = types.InlineKeyboardButton(text='+ 1🏅', callback_data="раздача")
+                        giveaway_bt.add(button)
+
+                        giveaway_mes = await message.answer(f"<a href='tg://user?id={userid}'>{name}</a> "
+                                                            f"устраивает раздачу лавэ {how_many}\n"
+                                                            f"Правила:\n"
+                                                            f"Нажимайте на кнопку, набирайте больше всех очков\n"
+                                                            f"Награда распределиться по количеству набранных очков\n"
+                                                            f"Раздача лавэ через 5:00",
+                                                            reply_markup=giveaway_bt)
+
+                        Loop = asyncio.get_event_loop()
+                        await Loop.create_task(giveaway_timer(giveaway_mes.message_id, userid, chatid))
+
+                else:
+                    await message.reply("Раздать можно не больше 1 миллиарда")
+            else:
+                await message.reply("Устраивать раздачу можно раз в 1 час")
+        else:
+            await message.reply("Минимальная сумма для раздачи 100 000")
+    else:
+        await message.reply("Устраивайте раздачу лавэ в чатах")
 
 
 async def trottled(callback_query, *args, **kwargs):
@@ -1563,8 +1759,8 @@ async def alldataUSERS(name, lastname, username, userid, chatid):
             pass
         if UserdIds < 1:
             cur.execute("INSERT INTO USERS (Name, LastName, UserName, UserId, Money, Bonustime, "
-                        "Lost, Won, Bonus_mes_id) "
-                        f"VALUES ('{name}','{lastname}','{username}','{userid}', 5000, 0, 0, 0, Null)")
+                        "Lost, Won, Bonus_mes_id, Giveaway_time) "
+                        f"VALUES ('{name}','{lastname}','{username}','{userid}', 5000, 0, 0, 0, Null, 0)")
         if UserdIds > 1:
             cur.execute("DELETE FROM USERS WHERE Id = (SELECT MAX(ID) FROM USERS WHERE USERID = '%i')" % userid)
     except Exception as e:
