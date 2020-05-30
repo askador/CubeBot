@@ -497,8 +497,38 @@ async def bonus(message):
                         (punkt, bonusmes.message_id, bonuserid))
             conn.commit()
 
+            loop_bonus = asyncio.get_event_loop()
+            await loop_bonus.create_task(start_bonus(name, bonuserid, chatid))
+
         conn.close()
 
+
+async def start_bonus(name, userid, chatid):
+    await asyncio.sleep(300)
+    try:
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
+        cur.execute("SELECT Lave FROM Bonus WHERE UserId = %i" % userid)
+        lave = cur.fetchall()
+        if lave:
+            cur.execute("SELECT Bonus_mes_id FROM USERS WHERE UserId = %i" % userid)
+            id_of_mes = cur.fetchall()[0][0]
+            try:
+                await bot.edit_message_text(chat_id=chatid, message_id=id_of_mes,
+                                            text="<a href='tg://user?id=%i'>%s</a> забирает свой бонус %s " %
+                                                 (userid, name, lave[0][0]))
+
+                cur.execute("DELETE FROM BONUS WHERE UserId = %i" % userid)
+                conn.commit()
+            except Exception:
+                pass
+            cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (lave[0][0], userid))
+            conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
 #  users stats
 @dp.message_handler(text='!стата')
