@@ -1773,7 +1773,7 @@ async def endgame(chatid):
 
     # UPDATE STATSLOG
     cur.execute("UPDATE STATS set WON = WON + %i, LOST = LOST + %i, PLAYS = PLAYS + 1 WHERE Id = 1" % (ALLwins, Lose))
-
+    conn.commit()
     conn.close()
 
     if WINstat == '':
