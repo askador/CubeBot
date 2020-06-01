@@ -635,7 +635,7 @@ async def top(message):
 
             await message.answer(topchik)
         except Exception as e:
-            message.reply("Oops, something went wrong")
+            await message.reply("Oops, something went wrong")
         conn.close()
 
 
