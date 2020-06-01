@@ -1151,27 +1151,30 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
-    cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % userid)
-    bonususermes = cur.fetchall()[0][0]
-
-    if bonususermes == mesid:
-        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-        paluchi = cur.fetchall()[0][0]
-
-        cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
-        bonnums = cur.fetchall()[0][0]
-
-        try:
-            await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                        text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                             "Лавэ %s, коеффициент = %.1f\n\n"
-                                             "             <b>%s</b> : 🎲 : 🎲 \n" %
-                                             (userid, name, paluchi, 1, bonnums[0]), reply_markup=keybonus)
-            await bot.answer_callback_query(callback_query.id)
-        except Exception as e:
-            pass
+    try:
+        cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % userid)
+        bonususermes = cur.fetchall()[0][0]
+    except Exception:
+        pass
     else:
-        await callback_query.answer("Не твоё")
+        if bonususermes == mesid:
+            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+            paluchi = cur.fetchall()[0][0]
+
+            cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
+            bonnums = cur.fetchall()[0][0]
+
+            try:
+                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                            text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                                 "Лавэ %s, коеффициент = %.1f\n\n"
+                                                 "             <b>%s</b> : 🎲 : 🎲 \n" %
+                                                 (userid, name, paluchi, 1, bonnums[0]), reply_markup=keybonus)
+                await bot.answer_callback_query(callback_query.id)
+            except Exception as e:
+                pass
+        else:
+            await callback_query.answer("Не твоё")
     conn.close()
 
 
