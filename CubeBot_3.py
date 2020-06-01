@@ -185,6 +185,8 @@ async def advice(message):
         if len(message.text.split()) != 1:
             await bot.send_message(chatid, "Oт @%s, %s\n\n%s" %
                                    (message.from_user.username, message.from_user.full_name, message.text))
+
+            await message.reply("Принято")
         else:
             await message.answer("Совет не может быть пустым")
     else:
@@ -1567,48 +1569,50 @@ async def double_bet(message):
 # ПЕРЕДАТЬ ДЕНЬГИ
 @dp.message_handler(regexp="(^[+][г])([' ']*)(\d)")
 async def transfer_money(message):
-    if 0 < int(''.join(message.text[2:].split())) < 10 ** 18 and message.reply_to_message is not None:
-        name = message.from_user.first_name
-        lastname = message.from_user.last_name
-        username = message.from_user.username
-        userid = message.from_user.id
-        chatid = message.chat.id
-        await alldataUSERS(name, lastname, username, userid, chatid)
-        try:
-            conn = psycopg2.connect(
-                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-            cur = conn.cursor()
-            if message.reply_to_message.from_user.is_bot is False:
-                howmuch = int(''.join(message.text[2:].split()))
-                whoid = message.reply_to_message.from_user.id
-                whoname = message.reply_to_message.from_user.first_name
-                wholastname = message.reply_to_message.from_user.last_name
-                whousername = message.reply_to_message.from_user.username
-                if userid != whoid:
-                    await alldataUSERS(whoname, wholastname, whousername, whoid, chatid)
-                    cur.execute("SELECT Money FROM USERS WHERE UserId = %i" % userid)
-                    balance = int(cur.fetchall()[0][0])
-                    if howmuch <= balance:
-                        cur.execute(
-                            "UPDATE USERS set Money = Money - %i WHERE UserId = %i" % (howmuch, userid))
-                        cur.execute(
-                            "UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (howmuch, whoid))
-                        await bot.send_message(chatid,
-                                               "<a href='tg://user?id=%i'>%s</a> передал "
-                                               "<a href='tg://user?id=%i'>%s</a> "
-                                               "%s грывень" % (userid, name, whoid, whoname, makegoodview(howmuch)))
+    try:
+        if 0 < int(''.join(message.text[2:].split())) < 10 ** 18 and message.reply_to_message is not None:
+            name = message.from_user.first_name
+            lastname = message.from_user.last_name
+            username = message.from_user.username
+            userid = message.from_user.id
+            chatid = message.chat.id
+            await alldataUSERS(name, lastname, username, userid, chatid)
+            try:
+                conn = psycopg2.connect(
+                    "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+                    "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+                cur = conn.cursor()
+                if message.reply_to_message.from_user.is_bot is False:
+                    howmuch = int(''.join(message.text[2:].split()))
+                    whoid = message.reply_to_message.from_user.id
+                    whoname = message.reply_to_message.from_user.first_name
+                    wholastname = message.reply_to_message.from_user.last_name
+                    whousername = message.reply_to_message.from_user.username
+                    if userid != whoid:
+                        await alldataUSERS(whoname, wholastname, whousername, whoid, chatid)
+                        cur.execute("SELECT Money FROM USERS WHERE UserId = %i" % userid)
+                        balance = int(cur.fetchall()[0][0])
+                        if howmuch <= balance:
+                            cur.execute(
+                                "UPDATE USERS set Money = Money - %i WHERE UserId = %i" % (howmuch, userid))
+                            cur.execute(
+                                "UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (howmuch, whoid))
+                            await bot.send_message(chatid,
+                                                   "<a href='tg://user?id=%i'>%s</a> передал "
+                                                   "<a href='tg://user?id=%i'>%s</a> "
+                                                   "%s грывень" % (userid, name, whoid, whoname, makegoodview(howmuch)))
 
-                    else:
-                        await bot.send_message(chatid, "Нету столько", reply_to_message_id=message.message_id)
+                        else:
+                            await bot.send_message(chatid, "Нету столько", reply_to_message_id=message.message_id)
 
-                await check_limit_money(whoid)
-        except Exception as e:
-            await message.reply("Oops. something went wrong. Try again.")
-        else:
-            conn.commit()
-            conn.close()
-
+                    await check_limit_money(whoid)
+            except Exception as e:
+                await message.reply("Oops. something went wrong. Try again.")
+            else:
+                conn.commit()
+                conn.close()
+    except Exception:
+        pass
 
 # ПРОВЕРКА НА СТАВКУ
 @dp.message_handler(regexp="(\d[' ']\d)$")
