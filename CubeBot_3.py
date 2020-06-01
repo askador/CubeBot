@@ -6,11 +6,11 @@ import psycopg2
 import asyncio
 import random
 import datetime
+import time
 
 bot = Bot(token='996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo', parse_mode='HTML')
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
-
 
 Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ',
         'CgACAgQAAxkBAAIYLl6jKaIkGk1Evh4-e8Xy6wQyux-DAAJaAgACb7ntUutpUszjF0COGQQ',
@@ -19,6 +19,7 @@ Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ
         'CgACAgQAAxkBAAIYMV6jKarED9koopdgh5T4AQnePVOYAAORAAKHGWQH9PG0ucr3uIkZBA',
         'CgACAgQAAxkBAAIYMl6jKatmTlt7OIkjaNIwfMjH1EelAAL5AQACd2lFU1qxqx5bO0StGQQ',
         'CgACAgQAAxkBAAIYM16jKa4_6XmB4cFcyFVr6DR37ftTAALhAQACp1_0UsLTIm4ovJNYGQQ']
+
 
 delayed_start_dict = {}
 shakeit = {}
@@ -85,57 +86,59 @@ async def rules_for_player(message):
 async def help_for_player(message):
     if message.from_user.id == message.chat.id:
         await message.answer("<b>Игровые команды:</b>\n\n"
-                       "<b>Кости</b> - запустить игру\n"
-                       "<b>Трясти</b> - бросить кубик\n"
-                       "<b>Отмена</b> - отмена ставок\n"
-                       "<b>Лавэ</b> - зырнуть наличные\n"
-                       "<b>Бонус</b> - забрать бонус (раз в 6 часов)"
-                       "<b>Ставки</b> - зырнуть шо поставил\n"
-                       "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n"
-                       "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n"
-                       "<b>!рейтинг | !рейтинг 10</b> - рейтинг игроков\n"
-                       "<b>!стата</b> - личная статистика\n"
-                       "<b>%п</b> - повторить ставку с прошлой игры\n"
-                       "<b>%у</b> - удвоить ставки\n"
-                       "\n"
-                       "<b>Над ботом работали:</b>\n"
-                       "<a href='tg://user?id=526497876'><b>Серый</b></a> и "
-                       "<a href='tg://user?id=547400918'><b>Миша</b></a>")
+                             "<b>Кости</b> - запустить игру\n"
+                             "<b>Трясти</b> - бросить кубик\n"
+                             "<b>Отмена</b> - отмена ставок\n"
+                             "<b>Лавэ</b> - зырнуть наличные\n"
+                             "<b>Бонус</b> - забрать бонус (раз в 2 часа)"
+                             "<b>Ставки</b> - зырнуть шо поставил\n"
+                             "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n"
+                             "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n"
+                             "<b>!рейтинг | !рейтинг 10</b> - рейтинг игроков\n"
+                             "<b>!стата</b> - личная статистика\n"
+                             "<b>!раздача [сколько]</b> - раздача лавэ (раз в час, не меньше 100 000"
+                             " и не больше 1 000 000 000)"
+                             "<b>%п</b> - повторить ставку с прошлой игры\n"
+                             "<b>%у</b> - удвоить ставки\n"
+                             "\n"
+                             "<b>Над ботом работали:</b>\n"
+                             "<a href='tg://user?id=526497876'><b>Серый</b></a> и "
+                             "<a href='tg://user?id=547400918'><b>Миша</b></a>")
     else:
         await message.reply("Используйте эту команду в личке с ботом")
 
 
 @dp.message_handler(commands=['statslog'])
 async def stats(message):
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     if message.from_user.id == 526497876 or message.from_user.id == 547400918 and message.text == '/statslog':
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT WON FROM STATS")
         won = cur.fetchall()[0][0]
         cur.execute("SELECT LOST FROM STATS")
         lost = cur.fetchall()[0][0]
         cur.execute("SELECT PLAYS FROM STATS")
         plays = cur.fetchall()[0][0]
-        conn.close()
         await message.answer("WON: %s\nLOST: %s\nPLAYS: %s" % (won, lost, plays))
     try:
         if message.from_user.id == 526497876 and message.text.split()[1] == "сбросить":
-            conn = psycopg2.connect(
-                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-            cur = conn.cursor()
             cur.execute("UPDATE STATS set WON = 0, LOST = 0, PLAYS = 0")
             conn.commit()
-            conn.close()
             await message.answer("Сброшено")
     except Exception:
         pass
 
+    conn.close()
+
 
 @dp.message_handler(commands=['setmoney'])
 async def setmoney(message):
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         papaid = message.from_user.id
         howmch = message.text.split()[1]
@@ -143,13 +146,8 @@ async def setmoney(message):
         try:
             if howmch.isdigit() is True and towho.isdigit() is True and howmch[0] != '+':
                 if 0 <= int(howmch) < 10 ** 18:
-                    conn = psycopg2.connect(
-                        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-                    cur = conn.cursor()
                     cur.execute("UPDATE USERS set Money = %i WHERE UserId = %i" % (int(howmch), int(towho)))
                     conn.commit()
-                    conn.close()
                     await bot.send_message(papaid, "SET completed")
 
                 else:
@@ -161,13 +159,8 @@ async def setmoney(message):
         try:
             if howmch[0] == '+':
                 if 0 < int(howmch) < 10 ** 18:
-                    conn = psycopg2.connect(
-                        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-                    cur = conn.cursor()
                     cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (int(howmch[1:]), int(towho)))
                     conn.commit()
-                    conn.close()
                     await bot.send_message(papaid, "ADDed")
                     await bot.send_message(towho, "Бонус %s💰" % makegoodview(howmch[1:]))
                 else:
@@ -176,13 +169,25 @@ async def setmoney(message):
             pass
 
         await check_limit_money(int(towho))
+    conn.close()
+
+
+async def anti_spam_advice(message, *args, **kwargs):
+    await message.reply("Не спамь")
 
 
 @dp.message_handler(commands=['advice'])
+@dp.throttled(anti_spam_advice, rate=10)
 async def advice(message):
     chatid = -443076596
-    await bot.send_message(chatid, "Oт @%s, %s\n%s\n-------------------------" %
-                            (message.from_user.username, message.from_user.first_name, message.text))
+    if message.chat.type == 'private':
+        if len(message.text.split()) != 1:
+            await bot.send_message(chatid, "Oт @%s, %s\n\n%s" %
+                                   (message.from_user.username, message.from_user.full_name, message.text))
+        else:
+            await message.answer("Совет не может быть пустым")
+    else:
+        await message.reply("Используйте эту команду в личке с ботом")
 
 
 #  |  ЗАПУСК ИГРЫ  |
@@ -199,39 +204,40 @@ async def start_game(message):
     await alldataCHAT(chatid)
     await alldataUSERS(name, lastname, username, userid, chatid)
 
-    # ВЫГРУЗКА ПАРАМЕТРОВ Shake, GAME
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
+    #  ЗАПУСТИТЬ ИГРУ
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
-        cur.execute("SELECT Game FROM GAME WHERE IDChat = %i" % chatid)
-        Game = cur.fetchall()[0][0]
-    except Exception as e:
-        pass
+        cur.execute("SELECT Game FROM Game WHERE IDChat = %i" % chatid)
+        Game = cur.fetchall()
+    except Exception:
+        await message.reply("Oops, something went wrong")
     else:
-        #  ЗАПУСТИТЬ ИГРУ
-        if Game is False:
-            try:
-                cur.execute("UPDATE GAME set Game = True WHERE IDChat = '%i'" % chatid)
-            except Exception as e:
-                await message.reply("Oops. something went wrong. Try again.")
-            else:
-                conn.commit()
-
-                await start_game_message(chatid)
-
-                # /tryasti antispam
-                shakeit.update([(chatid, False)])
-
-                # delayed start
-                delayed_start_dict.update([(message.chat.id, (int(message.date.timestamp()) + 30))])
-        else:
-            mes3 = await message.answer('Игра уже запущена')
+        if Game:
+            mes3 = await message.reply("Игра уже запущена")
             cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
                         (chatid, mes3.message_id))
             conn.commit()
-        conn.close()
+        else:
+            cur.execute("INSERT INTO Game (Game, Shake, IDChat, Time) VALUES (True, False, %i, %i)" %
+                        (chatid, int(message.date.timestamp())))
+            conn.commit()
+
+            await start_game_message(chatid)
+
+            # /tryasti antispam
+            shakeit.update([(chatid, False)])
+
+            # delayed start
+            delayed_start_dict.update([(message.chat.id, (int(message.date.timestamp()) + 20))])
+
+            # autostart
+            loop_autostrt = asyncio.get_event_loop()
+            await loop_autostrt.create_task(autostart(chatid))
+
+    conn.close()
 
 
 #  БРОСИТЬ КУБИКИ
@@ -243,23 +249,19 @@ async def shake_game(message):
     chatid = message.chat.id
     userid = message.from_user.id
 
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
+
     #   ВЫГРУЗКА ПАРАМЕТРА GAME
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Game FROM GAME WHERE IDChat = '%i'" % chatid)
         Game = cur.fetchall()[0][0]
-        conn.close()
     except Exception as exc:
         Game = False
 
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT UserId FROM BETS WHERE IDChat = %i" % chatid)
         user_in_bets = cur.fetchall()
         if user_in_bets and (userid,) in user_in_bets:
@@ -268,16 +270,10 @@ async def shake_game(message):
         pass
     else:
         conn.commit()
-        conn.close()
 
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Shake FROM GAME WHERE IDChat = '%i'" % chatid)
         Shake = cur.fetchall()[0][0]
-        conn.close()
     except Exception as exc:
         Shake = False
 
@@ -287,6 +283,8 @@ async def shake_game(message):
 
             try:
                 if int(delayed_start_dict[chatid]) - int(message.date.timestamp()) < 0 or chatid == userid:
+                    cur.execute("DELETE FROM GAME WHERE IDChat = %i" % chatid)
+                    conn.commit()
                     shakeit.update([(chatid, True)])
                     name = message.from_user.first_name
                     await shake(name, userid, chatid)
@@ -295,29 +293,32 @@ async def shake_game(message):
                     await message.answer("Бросить можно через %s сек" %
                                          str(delayed_start_dict[chatid] - int(message.date.timestamp())))
             except Exception as e:
+                cur.execute("DELETE FROM GAME WHERE IDChat = %i" % chatid)
+                conn.commit()
                 shakeit.update([(chatid, True)])
                 name = message.from_user.first_name
                 await shake(name, userid, chatid)
                 shakeit.update([(chatid, False)])
 
+        # ЕСЛИ НЕ СДЕЛАЛ СТАВКУ
+        if Game is True and Shake is False:
+            await message.reply("Сначала сделай ставку")
     except Exception as e:
         await message.reply("Oops. something went wrong. Try again.")
         shakeit.update([(chatid, False)])
 
-    # ЕСЛИ НЕ СДЕЛАЛ СТАВКУ
-    if Game is True and Shake is False:
-        await message.reply("Сначала сделай ставку")
+    conn.close()
 
 
 #  Ставки игрока
 @dp.message_handler(lambda message: message.text.lower() == 'ставки')
 async def userbets(message):
     chatid = message.chat.id
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Game FROM GAME WHERE IDChat = %i" % chatid)
         Game = cur.fetchall()[0][0]
     except Exception as e:
@@ -351,48 +352,55 @@ async def userbets(message):
                     await message.answer("%s, нэма ставок" % Name)
             except Exception as e:
                 await message.reply("Oops. something went wrong. Try again.")
-        conn.close()
+    conn.close()
 
 
 # canceling all user bets
 @dp.message_handler(lambda msg: msg.text.lower() == 'отмена')
 async def cancelbets(message):
+    global shakeit
     chatid = message.chat.id
     userid = message.from_user.id
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Game FROM GAME WHERE IDChat = %i" % chatid)
         Game = cur.fetchall()[0][0]
     except Exception as e:
         await message.reply("Oops. something went wrong. Try again.")
     else:
         if Game is True:
-            cur.execute("SELECT count(Bet) FROM BETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
-            useringame = cur.fetchall()[0][0]
-            if useringame > 0:
-                name = message.from_user.first_name
-                chatid = message.chat.id
-                cur.execute("SELECT Bet FROM BETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
-                Bet = cur.fetchall()
-                cur.execute("SELECT Numbers FROM BETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
-                Num = cur.fetchall()
-                try:
-                    if Bet != [] and Num != []:
-                        cur.execute("DELETE FROM BETS WHERE UserId = '%i' AND IDChat = %i" % (userid, chatid))
-                        for i in range(len(Bet)):
-                            cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = '%i'" % (Bet[i][0], userid))
-                            conn.commit()
-                        await message.reply("<a href='tg://user?id=%i'>%s</a> отмэныл ставки" % (
-                            userid, name))
+            try:
+                if shakeit[chatid] is False:
+                    cur.execute("SELECT count(Bet) FROM BETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
+                    useringame = cur.fetchall()[0][0]
+                    if useringame > 0:
+                        name = message.from_user.first_name
+                        chatid = message.chat.id
+                        cur.execute("SELECT Bet FROM BETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
+                        Bet = cur.fetchall()
+                        cur.execute("SELECT Numbers FROM BETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
+                        Num = cur.fetchall()
+                        try:
+                            if Bet != [] and Num != []:
+                                cur.execute("DELETE FROM BETS WHERE UserId = '%i' AND IDChat = %i" % (userid, chatid))
+                                for i in range(len(Bet)):
+                                    cur.execute(
+                                        "UPDATE USERS set Money = Money + %i WHERE UserId = '%i'" % (Bet[i][0], userid))
+                                    conn.commit()
+                                await message.reply("<a href='tg://user?id=%i'>%s</a> отмэныл ставки" % (
+                                    userid, name))
 
-                    else:
-                        message.reply("Отменять нечего")
-                except Exception as e:
-                    await message.reply("Oops. something went wrong. Try again.")
-        conn.close()
+                            else:
+                                message.reply("Отменять нечего")
+                        except Exception as e:
+                            await message.reply("Oops. something went wrong. Try again.")
+            except Exception:
+                await message.reply("Oops. something went wrong. Try again.")
+                shakeit.update([(chatid, False)])
+    conn.close()
 
 
 #  БАЛАНС ИГРОКА
@@ -405,17 +413,17 @@ async def usermoney(message):
     userid = message.from_user.id
     chatid = message.chat.id
     await alldataUSERS(name, lastname, username, userid, chatid)
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Money From USERS Where UserId = '%i'" % userid)
         mon = cur.fetchall()[0][0]
-        conn.close()
         await message.reply("%s грывень" % makegoodview(mon))
     except Exception as e:
         await message.reply("Oops. something went wrong. Try again.")
+    conn.close()
 
 
 # all chat logs
@@ -424,16 +432,15 @@ async def logsgame(message):
     chatid = message.chat.id
     await alldataCHAT(chatid)
 
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     LOG = ''
     namedb = 'logchat' + str(abs(chatid))
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Log FROM %s" % namedb)
         logs = cur.fetchall()
-        conn.close()
         for i in range(len(logs)):
             LOG += "🎲  %s\n" % logs[i][0]
         if LOG != '':
@@ -442,6 +449,8 @@ async def logsgame(message):
             await message.answer("Лог пустой")
     except Exception as e:
         await message.reply("Oops, something went wrong")
+
+    conn.close()
 
 
 @dp.message_handler(commands=['bonuslave'])
@@ -454,11 +463,11 @@ async def bonus(message):
     lastname = message.from_user.last_name
     await alldataUSERS(name, lastname, username, bonuserid, chatid)
 
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT BONUSTIME FROM USERS WHERE UserId = %s" % bonuserid)
         bonustime = int(cur.fetchall()[0][0])
     except Exception:
@@ -500,16 +509,16 @@ async def bonus(message):
             loop_bonus = asyncio.get_event_loop()
             await loop_bonus.create_task(start_bonus(name, bonuserid, chatid))
 
-        conn.close()
+    conn.close()
 
 
 async def start_bonus(name, userid, chatid):
     await asyncio.sleep(300)
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Lave FROM Bonus WHERE UserId = %i" % userid)
         lave = cur.fetchall()
         if lave:
@@ -526,9 +535,10 @@ async def start_bonus(name, userid, chatid):
                 pass
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (lave[0][0], userid))
             conn.commit()
-        conn.close()
     except Exception:
         pass
+    conn.close()
+
 
 #  users stats
 @dp.message_handler(text='!стата')
@@ -550,48 +560,48 @@ async def statuser(message):
 
 @dp.message_handler(text='!стата сбросить')
 async def drop_stats(message):
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
         if message.text.lower().split()[0] == '!стата' and message.text.lower().split()[1] == "сбросить":
             userid = message.from_user.id
-            conn = psycopg2.connect(
-                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-            cur = conn.cursor()
             cur.execute("UPDATE USERS set WON = 0, LOST = 0 WHERE UserId = %i" % userid)
             await message.answer("Стата сброшена")
             conn.commit()
-            conn.close()
     except Exception as e:
         await message.reply("Oops. something went wrong. Try again.")
+    conn.close()
 
 
 @dp.message_handler(regexp="!стата сбросить ([0-9]+)")
 async def drop_smbdy_stats(message):
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
         if message.text.split()[2].isdigit():
             userid = message.text.split()[2]
-            conn = psycopg2.connect(
-                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-            cur = conn.cursor()
             cur.execute("UPDATE USERS set WON = 0, LOST = 0 WHERE UserId = %i" % int(userid))
             await bot.send_message(message.chat.id, "Стата сброшена %s" % userid)
             conn.commit()
-            conn.close()
     except Exception as e:
         await message.reply("Oops. something went wrong. Try again.")
+    conn.close()
 
 
 @dp.message_handler(text='!рейтинг')
 async def top(message):
     if message.chat.id != message.from_user.id:
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
         try:
             rate = []
             chatid = message.chat.id
-            conn = psycopg2.connect(
-                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-            cur = conn.cursor()
             cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
             topofchat = cur.fetchall()
             topchik = ""
@@ -622,22 +632,22 @@ async def top(message):
                         topchik += str(q) + '. ' + str(ratesort[i][0]) + ' ' + str(ratesort[i][1]) + ' ' + \
                                    makegoodview(ratesort[i][2]) + '\n'
 
-            conn.close()
             await message.answer(topchik)
         except Exception as e:
             message.reply("Oops, something went wrong")
+        conn.close()
 
 
 @dp.message_handler(text='!рейтинг 10')
 async def top(message):
     if message.chat.id != message.from_user.id:
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
         try:
             rate = []
             chatid = message.chat.id
-            conn = psycopg2.connect(
-                "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-                "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-            cur = conn.cursor()
             cur.execute("SELECT UserId FROM chatusers WHERE IDChat = %i" % chatid)
             topofchat = cur.fetchall()
             topchik = ""
@@ -651,7 +661,6 @@ async def top(message):
                             rate.append(top[k][1:])
             ratesort = sorted(rate, key=lambda money: money[2])[::-1]
 
-            conn.close()
             for i in range(10):
                 q += 1
                 if ratesort[i][1] == 'None':
@@ -663,28 +672,37 @@ async def top(message):
             await message.answer(topchik)
         except Exception as e:
             message.reply("Oops, something went wrong")
+        conn.close()
 
 
 async def giveaway_timer(give_mes_id, userid, chatid):
     start_in = 300
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
+
+    cur.execute(f"SELECT FullName FROM GIVEAWAY%s WHERE UserId = %s" % (abs(chatid), userid))
+    starter = str(cur.fetchall()[0][0])
+
+    cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
+    how_many_proc = int(cur.fetchall()[0][0])
+
+    conn.close()
     while start_in > 0:
         await asyncio.sleep(3)
         start_in -= 3
         try:
+
             conn = psycopg2.connect(
                 "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                 "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
             cur = conn.cursor()
-            cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
-            how_many_proc = int(cur.fetchall()[0][0])
-
-            cur.execute(f"SELECT FullName FROM GIVEAWAY%s WHERE UserId = %s" % (abs(chatid), userid))
-            starter = str(cur.fetchall()[0][0])
-
             cur.execute(f"SELECT FullName, Value FROM GIVEAWAY{abs(chatid)}"
                         f" WHERE Value IS NOT NULL ORDER BY VALUE DESC")
             giveaway_data = cur.fetchall()
             conn.close()
+
             list_for_giveaway = ''
 
             for i in range(len(giveaway_data)):
@@ -697,14 +715,14 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             giveaway_bt_procc.add(button)
 
             await bot.edit_message_text(chat_id=chatid, message_id=give_mes_id, text=
-                                        f"<a href='tg://user?id={userid}'> {starter}</a> "
-                                        f"устраивает раздачу лавэ {makegoodview(how_many_proc)}\n"
-                                        f"Правила:\n"
-                                        f"Нажимайте на кнопку, набирайте больше всех очков\n"
-                                        f"Награда распределится по количеству набранных очков\n"
-                                        f"Раздача лавэ через {datetime.datetime.fromtimestamp(start_in).strftime('%M:%S')}"
-                                        f"\n\n"
-                                        f"{list_for_giveaway}",
+            f"<a href='tg://user?id={userid}'>{starter}</a> "
+            f"устраивает раздачу лавэ {makegoodview(how_many_proc)}\n"
+            f"Правила:\n"
+            f"Нажимайте на кнопку, набирайте больше всех очков\n"
+            f"Награда распределится по количеству набранных очков\n"
+            f"Раздача лавэ через {datetime.datetime.fromtimestamp(start_in).strftime('%M:%S')}"
+            f"\n\n"
+            f"{list_for_giveaway}",
                                         reply_markup=giveaway_bt_procc)
         except Exception:
             pass
@@ -717,7 +735,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
         cur = conn.cursor()
-        cur.execute(f"SELECT FullName, Value, UserId FROM GIVEAWAY{abs(chatid)} WHERE Value > 0")
+        cur.execute(f"SELECT FullName, Value, UserId FROM GIVEAWAY{abs(chatid)} WHERE Value > 0 DESC")
         final = cur.fetchall()
         if final:
             final_list = ''
@@ -726,14 +744,11 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             for i in range(len(final)):
                 all_values += int(final[i][1])
 
-            cur.execute(f"SELECT how_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
-            how_many = int(cur.fetchall()[0][0])
-
             for j in range(len(final)):
                 users_score = int(final[j][1])
                 fullname = str(final[j][0])
 
-                money = int(int(how_many / all_values) * users_score)
+                money = int(int(how_many_proc / all_values) * users_score)
 
                 final_list += "<a href='tg://user?id=%i'>%s</a>" % (final[j][2], fullname) + ' получил ' + \
                               str(makegoodview(money)) + '\n'
@@ -741,15 +756,13 @@ async def giveaway_timer(give_mes_id, userid, chatid):
                 cur.execute(f"UPDATE USERS SET Money = Money + {money} WHERE UserId = {final[j][2]}")
                 conn.commit()
 
-            await bot.send_message(chatid, "Итоги:\n\n" + final_list)
+            await bot.send_message(chatid, f"Итоги раздачи от <a href='tg://user?id={userid}'>{starter}</a>:\n"
+            "\n" + final_list)
 
             cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
             conn.commit()
         else:
-            cur.execute(f"SELECT How_many From GIVEAWAY{abs(chatid)} WHERE UserId = {userid}")
-            how_many_back = int(cur.fetchall()[0][0])
-
-            cur.execute(f"UPDATE USERS Set Money = Money + {how_many_back} WHERE UserId = {userid}")
+            cur.execute(f"UPDATE USERS Set Money = Money + {how_many_proc} WHERE UserId = {userid}")
             await bot.send_message(chatid, "Раздача не состоялась, некому раздавать лавэ")
             cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
             conn.commit()
@@ -757,7 +770,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
 
 
 @dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')
-@dp.throttled(rate=1.5)
+@dp.throttled(rate=1.3)
 async def scores(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
     userid = callback_query.from_user.id
@@ -766,11 +779,11 @@ async def scores(callback_query: types.CallbackQuery):
     lastname = callback_query.from_user.last_name
     username = callback_query.from_user.username
 
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute(f"SELECT UserId FROM GIVEAWAY{abs(chatid)} WHERE How_many IS NOT NULL")
         not_for_him = cur.fetchall()[0][0]
         if userid != not_for_him:
@@ -787,10 +800,9 @@ async def scores(callback_query: types.CallbackQuery):
             await bot.answer_callback_query(callback_query.id)
         else:
             await bot.answer_callback_query(callback_query.id, "Ты организатор")
-        conn.close()
     except Exception:
         pass
-
+    conn.close()
 
 
 @dp.message_handler(regexp='!раздача ([0-9]+)')
@@ -806,8 +818,8 @@ async def giveaway(message):
             cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
             time_for_giveaway = int(cur.fetchall()[0][0])
             conn.close()
-            if int(message.date.timestamp()) < time_for_giveaway or time_for_giveaway == 0 or userid != 526497876:
-                if int(message.text.split()[1]) <= 10**9:
+            if int(message.date.timestamp()) < time_for_giveaway or time_for_giveaway == 0:
+                if int(message.text.split()[1]) <= 10 ** 9:
                     name = str(message.from_user.full_name)
                     how_many = int(message.text.split()[1])
 
@@ -1367,11 +1379,11 @@ async def user_profile(userid, chatid):
 async def repeat_bet(message):
     global shakeit
     chatid = message.chat.id
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Game FROM GAME WHERE IDChat = %i" % chatid)
         Game = cur.fetchall()[0][0]
     except Exception as e:
@@ -1385,7 +1397,8 @@ async def repeat_bet(message):
                     name = message.from_user.first_name
                     lastname = message.from_user.last_name
                     username = message.from_user.username
-                    cur.execute("SELECT Bet, Numbers FROM PREVBETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
+                    cur.execute(
+                        "SELECT Bet, Numbers FROM PREVBETS WHERE UserId = %i AND IDChat = %i" % (userid, chatid))
                     prev = cur.fetchall()
                     if prev:
                         PrevBets = ''
@@ -1441,18 +1454,18 @@ async def repeat_bet(message):
             except Exception:
                 await message.reply("Oops. something went wrong. Try again.")
                 shakeit.update([(chatid, False)])
-        conn.close()
+    conn.close()
 
 
 # %у УДВОИТЬ ВСЕ СТАВКИ
 @dp.message_handler(text='%у')
 async def double_bet(message):
     chatid = message.chat.id
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Game FROM GAME WHERE IDChat = %i" % chatid)
         Game = cur.fetchall()[0][0]
     except Exception as e:
@@ -1503,7 +1516,7 @@ async def double_bet(message):
             except Exception as e:
                 await message.reply("Oops. something went wrong. Try again.")
                 shakeit.update([(chatid, False)])
-        conn.close()
+    conn.close()
 
 
 # ПЕРЕДАТЬ ДЕНЬГИ
@@ -1553,12 +1566,12 @@ async def transfer_money(message):
 
 
 # ПРОВЕРКА НА СТАВКУ
-@dp.message_handler(regexp="\d[' ']\d")
+@dp.message_handler(regexp="(\d[' ']\d)$")
+@dp.message_handler(regexp="(\d[ ]\d[-]\d)$")
 @dp.throttled(bet_trottled, rate=1.2)
 async def chekbet(message: types.Message):
     global shakeit
     chatid = message.chat.id
-    #    ВЫГРУЗКА GAME
     #    ВЫГРУЗКА GAME
     try:
         conn = psycopg2.connect(
@@ -1707,7 +1720,6 @@ async def start_game_message(chatid):
     t34 = types.InlineKeyboardButton(text='5 на 3-4', callback_data="3-4")
     t56 = types.InlineKeyboardButton(text='5 на 5-6', callback_data="5-6")
 
-
     game_kb.row(t12, t34, t56)
 
     start_mes = await bot.send_message(chatid, "🧖🏽‍♂️Бросаем кубики нэ стесняемся🎲\n"
@@ -1722,6 +1734,45 @@ async def start_game_message(chatid):
     cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
                 (chatid, start_mes.message_id))
     conn.commit()
+    conn.close()
+
+
+async def autostart(chatid):
+    global shakeit
+    await asyncio.sleep(300)
+
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
+    cur.execute("SELECT Game, Time FROM GAME WHERE IDChat = %i" % chatid)
+    data = cur.fetchall()
+    if data:
+        Game = data[0][0]
+        Time = int(data[0][1])
+
+        if 300 <= int(time.time()) - Time <= 308 and Game is True:
+            shakeit.update([(chatid, True)])
+            #   STOP GAME
+            cur.execute("DELETE FROM GAME WHERE IDChat = %i" % chatid)
+            conn.commit()
+
+            cur.execute("SELECT MessId FROM ToDelMes WHERE IDChat = '%i'" % chatid)
+            messid = cur.fetchall()
+            for i in range(len(messid)):
+                try:
+                    await bot.delete_message(chatid, messid[i][0])
+                except Exception as e:
+                    pass
+            cur.execute("DELETE FROM todelmes where idchat = '%i'" % chatid)
+            conn.commit()
+
+            await algoritm(chatid)
+            await endgame(chatid)
+
+            cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
+            conn.commit()
+            shakeit.update([(chatid, False)])
     conn.close()
 
 
@@ -1742,31 +1793,12 @@ def makegoodview(how):
 
 #  add data of chat to db
 async def alldataCHAT(chatid):
-    #   ДОБАВЛЕНИЕ ЧАТА
-    try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
-        cur.execute("SELECT Count(IDChat) FROM GAME WHERE IDChat = %i" % chatid)
-        IDChat = cur.fetchall()[0][0]
-        if IDChat == 1:
-            pass
-        if IDChat < 1:
-            cur.execute("INSERT INTO GAME (IDChat) VALUES (%i)" % chatid)
-    except Exception as e:
-        pass
-
-    else:
-        conn.commit()
-        conn.close()
-
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     #   ДОБАВЛЕНИЕ ТАБЛИЦЫ ЛОГОВ ЧАТА
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         namedb = 'logchat' + str(abs(chatid))
         cur.execute("CREATE TABLE if not exists %s"
                     "(Id     Serial,"
@@ -1777,17 +1809,17 @@ async def alldataCHAT(chatid):
         await asyncio.sleep(1)
     else:
         conn.commit()
-        conn.close()
+    conn.close()
 
 
 #  add data of user to db
 async def alldataUSERS(name, lastname, username, userid, chatid):
+    conn = psycopg2.connect(
+        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+    cur = conn.cursor()
     #   ДОБАВЛЕНИЕ ИГРОКОВ
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         cur.execute("SELECT Count(UserId) FROM USERS WHERE UserId = '%i'" % userid)
         UserdIds = cur.fetchall()[0][0]
         if UserdIds == 1:
@@ -1802,28 +1834,20 @@ async def alldataUSERS(name, lastname, username, userid, chatid):
         pass
     else:
         conn.commit()
-        conn.close()
 
     #   ДЛЯ РЕЙТИНГА
     try:
-        conn = psycopg2.connect(
-            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-        cur = conn.cursor()
         if userid != chatid:
             cur.execute("SELECT Count(UserId) FROM chatusers WHERE IDChat = %i AND UserID = %i" % (chatid, userid))
             UserdIds = cur.fetchall()[0][0]
-            if UserdIds == 1:
-                pass
-
-            elif UserdIds < 1:
+            if UserdIds < 1:
                 cur.execute("INSERT INTO chatusers (IDChat, UserId) VALUES (%i, %i)" % (chatid, userid))
     except Exception as e:
         pass
 
     else:
         conn.commit()
-        conn.close()
+    conn.close()
 
 
 async def check_limit_money(userid):
@@ -1833,22 +1857,21 @@ async def check_limit_money(userid):
     userid = int(userid)
     cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
     money = cur.fetchall()[0][0]
-    if money > 2**55:
-        cur.execute("UPDATE USERS SET MONEY = %i WHERE USERID = %i" % (10**16, userid))
+    if money > 2 ** 55:
+        cur.execute("UPDATE USERS SET MONEY = %i WHERE USERID = %i" % (10 ** 16, userid))
         conn.commit()
     conn.close()
 
 
 #  start shaking  --> endgame
 async def shake(name, userid, chatid):
-    global startmes, shakeit
-
     # deleting all messages from bot in game
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
     cur.execute("SELECT MessId FROM ToDelMes WHERE IDChat = '%i'" % chatid)
     messid = cur.fetchall()
+
     for i in range(len(messid)):
         try:
             await bot.delete_message(chatid, messid[i][0])
@@ -1877,17 +1900,10 @@ async def shake(name, userid, chatid):
 
     # -------------------------------
 
-
     #   STOP GAME
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
-    cur.execute("UPDATE GAME set Game = False WHERE IDChat = %i" % chatid)
-    conn.commit()
-
-    #   STOP SHAKE
-    cur.execute("UPDATE GAME set Shake = False WHERE IDChat = %i" % chatid)
-    conn.commit()
 
     cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
     conn.commit()
@@ -1947,17 +1963,17 @@ async def endgame(chatid):
         #   ВСЕ СТАВКИ
         Fstat += Names + ' ' + makegoodview(str(UsBet)) + ' на ' + UsNum + '\n'
 
-
         #   ВЫИГРАЛИ
         #   1000 2-4
         try:
             if len(UsNum.split('-')) == 2:
-                if int(UsNum.split('-')[0]) <=Numbers <= int(UsNum.split('-')[1]):
+                if int(UsNum.split('-')[0]) <= Numbers <= int(UsNum.split('-')[1]):
                     Prize = int(int(UsBet) * 6 / (int(UsNum[2]) - int(UsNum[0]) + 1))
                     ALLwins += 1
 
                     cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = '%i'" % (Prize, UsId))
-                    cur.execute("UPDATE USERS set WON = WON + %i WHERE UserId = '%i'" % (int(int(Prize) - int(UsBet)), UsId))
+                    cur.execute(
+                        "UPDATE USERS set WON = WON + %i WHERE UserId = '%i'" % (int(int(Prize) - int(UsBet)), UsId))
                     conn.commit()
 
                     WINstat += "💰<a href='tg://user?id=%i'>%s</a>" % (UsId, Names) + \
@@ -1974,7 +1990,8 @@ async def endgame(chatid):
 
                 cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (Prize, UsId))
                 await check_limit_money(UsId)
-                cur.execute("UPDATE USERS set WON = WON + %i WHERE UserId = '%i'" % (int(int(Prize) - int(UsBet)), UsId))
+                cur.execute(
+                    "UPDATE USERS set WON = WON + %i WHERE UserId = '%i'" % (int(int(Prize) - int(UsBet)), UsId))
                 conn.commit()
 
                 WINstat += "💰<a href='tg://user?id=%i'>%s</a>" % (UsId, Names) + \
