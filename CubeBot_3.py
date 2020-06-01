@@ -818,7 +818,7 @@ async def giveaway(message):
             cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
             time_for_giveaway = int(cur.fetchall()[0][0])
             conn.close()
-            if int(message.date.timestamp()) < time_for_giveaway or time_for_giveaway == 0:
+            if int(message.date.timestamp()) > time_for_giveaway or time_for_giveaway == 0:
                 if int(message.text.split()[1]) <= 10 ** 9:
                     name = str(message.from_user.full_name)
                     how_many = int(message.text.split()[1])
