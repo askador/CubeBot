@@ -904,189 +904,233 @@ async def process_callback_game_buttons(callback_query: types.CallbackQuery):
         bet = 5
         num = '1'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+    
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '2':
         bet = 5
         num = '2'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '3':
         bet = 5
         num = '3'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '4':
         bet = 5
         num = '4'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '5':
         bet = 5
         num = '5'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '6':
         bet = 5
         num = '6'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '1-3':
         bet = 5
         num = '1-3'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '4-6':
         bet = 5
         num = '4-6'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '1-2':
         bet = 5
         num = '1-2'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '3-4':
         bet = 5
         num = '3-4'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     if callback_query.data == '5-6':
         bet = 5
         num = '5-6'
         #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-        groshi = cur.fetchall()[0][0]
-        if groshi >= bet:
-            await confirmbets(name, lastname, username, userid, chatid, num, bet)
+        try:
+            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+            groshi = cur.fetchall()[0][0]
+        except Exception:
             await bot.answer_callback_query(callback_query.id)
-
         else:
-            mes1 = await callback_query.message.answer(
-                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes1.message_id))
-            conn.commit()
-            await bot.answer_callback_query(callback_query.id)
+            if groshi >= bet:
+                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                await bot.answer_callback_query(callback_query.id)
+
+            else:
+                mes1 = await callback_query.message.answer(
+                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes1.message_id))
+                conn.commit()
+                await bot.answer_callback_query(callback_query.id)
     conn.close()
 
 
