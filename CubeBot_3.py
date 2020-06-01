@@ -21,6 +21,7 @@ Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ
         'CgACAgQAAxkBAAIYM16jKa4_6XmB4cFcyFVr6DR37ftTAALhAQACp1_0UsLTIm4ovJNYGQQ']
 
 
+
 delayed_start_dict = {}
 shakeit = {}
 auto_start_dict = {}
@@ -735,7 +736,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
         cur = conn.cursor()
-        cur.execute(f"SELECT FullName, Value, UserId FROM GIVEAWAY{abs(chatid)} WHERE Value > 0 DESC")
+        cur.execute(f"SELECT FullName, Value, UserId FROM GIVEAWAY{abs(chatid)} WHERE Value > 0 ORDER BY Value DESC")
         final = cur.fetchall()
         if final:
             final_list = ''
