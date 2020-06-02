@@ -220,10 +220,19 @@ async def start_game(message):
         await message.reply("Oops, something went wrong")
     else:
         if Game:
-            mes3 = await message.reply("Игра уже запущена")
-            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                        (chatid, mes3.message_id))
-            conn.commit()
+            try:
+                if shakeit[chatid] is True:
+                    mes3 = await message.reply("Игра уже запущена")
+                    cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                                (chatid, mes3.message_id))
+            except Exception:
+                mes3 = await message.reply("Игра уже запущена")
+                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                            (chatid, mes3.message_id))
+                conn.commit()
+            else:
+                conn.commit()
+
         else:
             cur.execute("INSERT INTO Game (Game, Shake, IDChat, Time) VALUES (True, False, %i, %i)" %
                         (chatid, int(message.date.timestamp())))
