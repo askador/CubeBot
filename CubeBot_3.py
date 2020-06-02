@@ -220,35 +220,37 @@ async def start_game(message):
         await message.reply("Oops, something went wrong")
     else:
         if Game:
+            mes3 = await message.reply("Игра уже запущена")
+            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                        (chatid, mes3.message_id))
+            conn.commit()
+        elif not Game:
             try:
                 if shakeit[chatid] is True:
                     mes3 = await message.reply("Игра уже запущена")
                     cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
                                 (chatid, mes3.message_id))
             except Exception:
-                mes3 = await message.reply("Игра уже запущена")
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes3.message_id))
-                conn.commit()
+                shakeit.update([(chatid, False)])
+                await message.reply("Oops, something went wrong. Try again")
             else:
                 conn.commit()
+                if shakeit[chatid] is False:
+                    cur.execute("INSERT INTO Game (Game, Shake, IDChat, Time) VALUES (True, False, %i, %i)" %
+                                (chatid, int(message.date.timestamp())))
+                    conn.commit()
 
-        else:
-            cur.execute("INSERT INTO Game (Game, Shake, IDChat, Time) VALUES (True, False, %i, %i)" %
-                        (chatid, int(message.date.timestamp())))
-            conn.commit()
+                    await start_game_message(chatid)
 
-            await start_game_message(chatid)
+                    # /tryasti antispam
+                    shakeit.update([(chatid, False)])
 
-            # /tryasti antispam
-            shakeit.update([(chatid, False)])
+                    # delayed start
+                    delayed_start_dict.update([(message.chat.id, (int(message.date.timestamp()) + 20))])
 
-            # delayed start
-            delayed_start_dict.update([(message.chat.id, (int(message.date.timestamp()) + 20))])
-
-            # autostart
-            loop_autostrt = asyncio.get_event_loop()
-            await loop_autostrt.create_task(autostart(chatid))
+                    # autostart
+                    loop_autostrt = asyncio.get_event_loop()
+                    await loop_autostrt.create_task(autostart(chatid))
 
     conn.close()
 
