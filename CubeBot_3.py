@@ -8,6 +8,8 @@ import random
 import datetime
 import time
 
+from aiogram.utils.exceptions import Unauthorized, MessageError
+
 bot = Bot(token='996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo', parse_mode='HTML')
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
@@ -75,10 +77,9 @@ async def rules_for_player(message):
                              "• отправьте сообщение Трясти или нажмите на кнопку 'Трясти' для броска кубика\n"
                              "\n"
                              "Ставки имеют вид:\n"
-                             "(сколько) на (число(а) кубика)\n"
+                             "(сколько) (число(а) кубика)\n"
                              "Пример:\n"
-                             " 100 на 5 | 50 2\n"
-                             "20 на 1-3 | 30 5-6")
+                             " 30 5-6 | 50 2")
     else:
         await message.reply("Используйте эту команду в личке с ботом")
 
@@ -90,15 +91,15 @@ async def help_for_player(message):
                              "<b>Кости</b> - запустить игру\n"
                              "<b>Трясти</b> - бросить кубик\n"
                              "<b>Отмена</b> - отмена ставок\n"
-                             "<b>Лавэ</b> - зырнуть наличные\n"
-                             "<b>Бонус</b> - забрать бонус (раз в 2 часа)"
+                             "<b>Лавэ</b> - зырнуть наличные"
+                             "<b>Бонус</b> - забрать бонус (раз в 2 часа)\n"
                              "<b>Ставки</b> - зырнуть шо поставил\n"
                              "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n"
                              "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n"
                              "<b>!рейтинг | !рейтинг 10</b> - рейтинг игроков\n"
                              "<b>!стата</b> - личная статистика\n"
                              "<b>!раздача [сколько]</b> - раздача лавэ (раз в час, не меньше 100 000"
-                             " и не больше 1 000 000 000)"
+                             " и не больше 1 000 000 000)\n"
                              "<b>%п</b> - повторить ставку с прошлой игры\n"
                              "<b>%у</b> - удвоить ставки\n"
                              "\n"
@@ -902,237 +903,28 @@ async def process_callback_game_buttons(callback_query: types.CallbackQuery):
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
-    if callback_query.data == '1':
-        bet = 5
-        num = '1'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-    
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '2':
-        bet = 5
-        num = '2'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
 
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '3':
-        bet = 5
-        num = '3'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
+    bet = 5
+    num = str(callback_query.data)
+    #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
+    try:
+        cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+        groshi = cur.fetchall()[0][0]
+    except Exception:
+        await bot.answer_callback_query(callback_query.id)
+    else:
+        if groshi >= bet:
+            await confirmbets(name, lastname, username, userid, chatid, num, bet)
             await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
 
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '4':
-        bet = 5
-        num = '4'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
+        else:
+            mes1 = await callback_query.message.answer(
+                "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+            cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                        (chatid, mes1.message_id))
+            conn.commit()
             await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
 
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '5':
-        bet = 5
-        num = '5'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '6':
-        bet = 5
-        num = '6'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '1-3':
-        bet = 5
-        num = '1-3'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '4-6':
-        bet = 5
-        num = '4-6'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '1-2':
-        bet = 5
-        num = '1-2'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '3-4':
-        bet = 5
-        num = '3-4'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
-    if callback_query.data == '5-6':
-        bet = 5
-        num = '5-6'
-        #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-        try:
-            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-            groshi = cur.fetchall()[0][0]
-        except Exception:
-            await bot.answer_callback_query(callback_query.id)
-        else:
-            if groshi >= bet:
-                await confirmbets(name, lastname, username, userid, chatid, num, bet)
-                await bot.answer_callback_query(callback_query.id)
-
-            else:
-                mes1 = await callback_query.message.answer(
-                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                            (chatid, mes1.message_id))
-                conn.commit()
-                await bot.answer_callback_query(callback_query.id)
     conn.close()
 
 
@@ -1193,35 +985,38 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
-    cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % userid)
-    bonususermes = cur.fetchall()[0][0]
-
-    if bonususermes == mesid:
-        cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
-        bonnums2 = cur.fetchall()[0][0]
-
-        try:
-            if bonnums2[0] == bonnums2[1]:
-                await coef(bonnums2[0], userid)
-
-            cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
-            paluchi3 = cur.fetchall()[0][0]
-
-            cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
-            boncoef = cur.fetchall()[0][0]
-
-            await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                        text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                             "Лавэ %s, коеффициент = %.1f\n\n"
-                                             "               <b>%s</b> : <b>%s</b> : 🎲 \n" %
-                                             (userid, name, paluchi3, boncoef, bonnums2[0], bonnums2[1]),
-                                        reply_markup=keybonus1)
-            await bot.answer_callback_query(callback_query.id)
-        except Exception:
-            pass
-
+    try:
+        cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % userid)
+        bonususermes = cur.fetchall()[0][0]
+    except Exception:
+        pass
     else:
-        await callback_query.answer("Не твоё")
+        if bonususermes == mesid:
+            cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
+            bonnums2 = cur.fetchall()[0][0]
+
+            try:
+                if bonnums2[0] == bonnums2[1]:
+                    await coef(bonnums2[0], userid)
+
+                cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
+                paluchi3 = cur.fetchall()[0][0]
+
+                cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
+                boncoef = cur.fetchall()[0][0]
+
+                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                            text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                                 "Лавэ %s, коеффициент = %.1f\n\n"
+                                                 "               <b>%s</b> : <b>%s</b> : 🎲 \n" %
+                                                 (userid, name, paluchi3, boncoef, bonnums2[0], bonnums2[1]),
+                                            reply_markup=keybonus1)
+                await bot.answer_callback_query(callback_query.id)
+            except Exception:
+                pass
+
+        else:
+            await callback_query.answer("Не твоё")
 
     conn.close()
 
@@ -1295,105 +1090,108 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
-    cur.execute("SELECT Bonus_mes_id FROM USERS WHERE UserId = %i" % userid)
-    bonususermes = cur.fetchall()[0][0]
-
-    if bonususermes == mesid:
-
-        cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
-        bonnums3 = cur.fetchall()[0][0]
-
-        try:
-            if bonnums3[0] == bonnums3[2] or bonnums3[1] == bonnums3[2] and len(list(set(bonnums3))) != 1:
-                await coef(bonnums3[2], userid)
-
-            if len(list(set(bonnums3))) == 1:
-                if bonnums3[0] == '1':
-                    mnozitel2 = 25
-                    cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                    cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                    paluchi5 = cur.fetchall()[0][0]
-                    paluchi5 = paluchi5 * mnozitel2
-                    cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                    conn.commit()
-                elif bonnums3[0] == '2':
-                    mnozitel2 = 28
-                    cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                    cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                    paluchi5 = cur.fetchall()[0][0]
-                    paluchi5 = paluchi5 * mnozitel2
-                    cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                    conn.commit()
-                elif bonnums3[0] == '3':
-                    mnozitel2 = 33
-                    cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                    cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                    paluchi5 = cur.fetchall()[0][0]
-                    paluchi5 = paluchi5 * mnozitel2
-                    cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                    conn.commit()
-                elif bonnums3[0] == '4':
-                    mnozitel2 = 38
-                    cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                    cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                    paluchi5 = cur.fetchall()[0][0]
-                    paluchi5 = paluchi5 * mnozitel2
-                    cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                    conn.commit()
-                elif bonnums3[0] == '5':
-                    mnozitel2 = 45
-                    cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                    cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                    paluchi5 = cur.fetchall()[0][0]
-                    paluchi5 = paluchi5 * mnozitel2
-                    cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                    conn.commit()
-                elif bonnums3[0] == '6':
-                    mnozitel2 = 50
-                    cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                    cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                    paluchi5 = cur.fetchall()[0][0]
-                    paluchi5 = paluchi5 * mnozitel2
-                    cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                    conn.commit()
-
-            cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
-            paluchi0 = cur.fetchall()[0][0]
-
-            cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (paluchi0, userid))
-            conn.commit()
-            await check_limit_money(userid)
-
-            cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
-            boncoef5 = cur.fetchall()[0][0]
-
-            await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                        text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                             "Лавэ %s, коеффициент = %.1f\n\n"
-                                             "               <b>%s</b> : <b>%s</b> : <b>%s</b> \n" %
-                                             (userid, name, paluchi0, boncoef5, bonnums3[0], bonnums3[1], bonnums3[2]),
-                                        reply_markup=keybonus2)
-
-            await bot.answer_callback_query(callback_query.id)
-
-            await asyncio.sleep(2)
-            await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                        text="<a href='tg://user?id=%i'>%s</a> забирает свой бонус %s " %
-                                             (userid, name, paluchi0))
-
-            cur.execute("DELETE FROM BONUS WHERE UserId = %i" % userid)
-            conn.commit()
-        except Exception:
-            pass
-
+    try:
+        cur.execute("SELECT Bonus_mes_id FROM USERS WHERE UserId = %i" % userid)
+        bonususermes = cur.fetchall()[0][0]
+    except Exception:
+        pass
     else:
-        await callback_query.answer("Не твоё")
+        if bonususermes == mesid:
+
+            cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
+            bonnums3 = cur.fetchall()[0][0]
+
+            try:
+                if bonnums3[0] == bonnums3[2] or bonnums3[1] == bonnums3[2] and len(list(set(bonnums3))) != 1:
+                    await coef(bonnums3[2], userid)
+
+                if len(list(set(bonnums3))) == 1:
+                    if bonnums3[0] == '1':
+                        mnozitel2 = 25
+                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                        paluchi5 = cur.fetchall()[0][0]
+                        paluchi5 = paluchi5 * mnozitel2
+                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                        conn.commit()
+                    elif bonnums3[0] == '2':
+                        mnozitel2 = 28
+                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                        paluchi5 = cur.fetchall()[0][0]
+                        paluchi5 = paluchi5 * mnozitel2
+                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                        conn.commit()
+                    elif bonnums3[0] == '3':
+                        mnozitel2 = 33
+                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                        paluchi5 = cur.fetchall()[0][0]
+                        paluchi5 = paluchi5 * mnozitel2
+                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                        conn.commit()
+                    elif bonnums3[0] == '4':
+                        mnozitel2 = 38
+                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                        paluchi5 = cur.fetchall()[0][0]
+                        paluchi5 = paluchi5 * mnozitel2
+                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                        conn.commit()
+                    elif bonnums3[0] == '5':
+                        mnozitel2 = 45
+                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                        paluchi5 = cur.fetchall()[0][0]
+                        paluchi5 = paluchi5 * mnozitel2
+                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                        conn.commit()
+                    elif bonnums3[0] == '6':
+                        mnozitel2 = 50
+                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                        paluchi5 = cur.fetchall()[0][0]
+                        paluchi5 = paluchi5 * mnozitel2
+                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                        conn.commit()
+
+                cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
+                paluchi0 = cur.fetchall()[0][0]
+
+                cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (paluchi0, userid))
+                conn.commit()
+                await check_limit_money(userid)
+
+                cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
+                boncoef5 = cur.fetchall()[0][0]
+
+                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                            text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                                 "Лавэ %s, коеффициент = %.1f\n\n"
+                                                 "               <b>%s</b> : <b>%s</b> : <b>%s</b> \n" %
+                                                 (userid, name, paluchi0, boncoef5, bonnums3[0], bonnums3[1], bonnums3[2]),
+                                            reply_markup=keybonus2)
+
+                await bot.answer_callback_query(callback_query.id)
+
+                await asyncio.sleep(2)
+                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                            text="<a href='tg://user?id=%i'>%s</a> забирает свой бонус %s " %
+                                                 (userid, name, paluchi0))
+
+                cur.execute("DELETE FROM BONUS WHERE UserId = %i" % userid)
+                conn.commit()
+            except Exception:
+                pass
+
+        else:
+            await callback_query.answer("Не твоё")
     conn.close()
 
 
@@ -1616,6 +1414,7 @@ async def transfer_money(message):
                 conn.close()
     except Exception:
         pass
+
 
 # ПРОВЕРКА НА СТАВКУ
 @dp.message_handler(regexp="(\d[' ']\d)$")
@@ -2103,6 +1902,13 @@ async def algoritm(chatid):
         cur.execute("DELETE FROM %s WHERE Id <= (SELECT MAX(Id) FROM %s) - 10" % (namedb, namedb))
         conn.commit()
     conn.close()
+
+
+@dp.errors_handler(exception=Unauthorized)
+@dp.errors_handler(exception=MessageError)
+async def error_handler(update, e):
+    print(e)
+    return True
 
 
 # polling
