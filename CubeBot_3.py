@@ -1878,6 +1878,7 @@ async def endgame(chatid):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
+    await asyncio.sleep(4)
     try:
         await bot.delete_message(chatid, mes2.message_id)
     except Exception as e:
