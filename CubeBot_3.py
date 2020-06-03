@@ -1229,7 +1229,7 @@ async def user_profile(userid, chatid):
                "<b>Лавэ: </b>%s\n" \
                "<b>Выиграно: </b>%s\n" \
                "<b>Проиграно: </b>%s\n" \
-               "<b>Игр сыгранно: </b>%s\n" \
+               "<b>Игр сыграно: </b>%s\n" \
                "\n" \
                "<b>Id: </b>%i" % (Name, Lave, Won, Lost, Plays, userid)
     await bot.send_message(chatid, profile)
