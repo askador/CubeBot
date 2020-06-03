@@ -1211,7 +1211,7 @@ async def user_profile(userid, chatid):
     conn = psycopg2.connect("postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
                             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
     cur = conn.cursor()
-    cur.execute("SELECT Name, LastName, Money, Won, Lost FROM Users WHERE UserId = %i" % userid)
+    cur.execute("SELECT Name, LastName, Money, Won, Lost, plays FROM Users WHERE UserId = %i" % userid)
     usstat = cur.fetchall()
     conn.close()
     profile = ''
@@ -1223,13 +1223,15 @@ async def user_profile(userid, chatid):
     Lave = makegoodview(usstat[0][2])
     Won = makegoodview(str(usstat[0][3]))
     Lost = makegoodview(str(usstat[0][4]))
+    Plays = usstat[0][5]
 
     profile += "<b>Имя: </b>%s\n" \
                "<b>Лавэ: </b>%s\n" \
                "<b>Выиграно: </b>%s\n" \
                "<b>Проиграно: </b>%s\n" \
+               "<b>Игр сыгранно: </b>%s\n" \
                "\n" \
-               "<b>Id: </b>%i" % (Name, Lave, Won, Lost, userid)
+               "<b>Id: </b>%i" % (Name, Lave, Won, Lost, Plays, userid)
     await bot.send_message(chatid, profile)
 
 
@@ -1773,6 +1775,7 @@ async def shake(name, userid, chatid):
 
 
 async def endgame(chatid):
+    list_of_plays = []
     mes2 = await bot.send_animation(chatid, random.choice(Gifs))
 
     # ВСЕ СТАВКИ
@@ -1818,6 +1821,9 @@ async def endgame(chatid):
             pass
         else:
             conn.commit()
+
+        #  Для статистики
+        list_of_plays.append(UsId)
 
         cur.execute("SELECT Name FROM USERS WHERE UserId = %i" % UsId)
         Names = str(cur.fetchall()[0][0])
@@ -1884,6 +1890,13 @@ async def endgame(chatid):
     # UPDATE STATSLOG
     cur.execute("UPDATE STATS set WON = WON + %i, LOST = LOST + %i, PLAYS = PLAYS + 1 WHERE Id = 1" % (ALLwins, Lose))
     conn.commit()
+
+    # update plays stats
+    list_of_plays = list(set(list_of_plays))
+    for i in range(len(list_of_plays)):
+        cur.execute("UPDATE USERS set Plays = Plays + 1 WHERE UserId = %i" % list_of_plays[i])
+        conn.commit()
+
     conn.close()
 
     if WINstat == '':
