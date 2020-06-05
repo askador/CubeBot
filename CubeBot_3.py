@@ -110,45 +110,47 @@ async def help_for_player(message):
 
 @dp.message_handler(regexp="!достижение ([0-9]+)")
 async def achieve(message):
-    userid = int(message.text.split()[1])
-    achieve = str(' '.join(message.text.split()[2:]))
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        userid = int(message.text.split()[1])
+        achieve = str(' '.join(message.text.split()[2:]))
 
-    conn = psycopg2.connect(
-        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-    cur = conn.cursor()
-    try:
-        cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES (%i, '%s')" % (userid, achieve))
-    except Exception as e:
-        await message.reply("Не удалось добавить")
-    else:
-        conn.commit()
-        await message.answer(f"Achievement {achieve} was added to {userid}")
-    conn.close()
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
+        try:
+            cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES (%i, '%s')" % (userid, achieve))
+        except Exception as e:
+            await message.reply("Не удалось добавить")
+        else:
+            conn.commit()
+            await message.answer(f"Achievement {achieve} was added to {userid}")
+        conn.close()
 
 
 @dp.message_handler(regexp="!у достижение ([0-9]+)")
 async def achieve(message):
-    conn = psycopg2.connect(
-        "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
-        "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
-    cur = conn.cursor()
-    try:
-        userid = int(message.text.split()[2])
-        achieve = str(' '.join(message.text.split()[3:]))
-    except Exception:
-        await message.reply("Not correct!\n!у достижение id achievement")
-    else:
-        cur.execute("SELECT Achieve FROM ACHIVES WHERE UserId = %i AND Achieve = '%s'" % (userid, achieve))
-        can_del = cur.fetchall()
-        print(can_del)
-        if can_del:
-            cur.execute("DELETE FROM ACHIVES WHERE Achieve = '%s' AND UserId = %i" % (achieve, userid))
-            conn.commit()
-            await message.answer(f"Achievement {achieve} was removed from {userid}")
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        conn = psycopg2.connect(
+            "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
+            "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
+        cur = conn.cursor()
+        try:
+            userid = int(message.text.split()[2])
+            achieve = str(' '.join(message.text.split()[3:]))
+        except Exception:
+            await message.reply("Not correct!\n!у достижение id achievement")
         else:
-            await message.answer("Проверьте правильность ID и названия достижения")
-    conn.close()
+            cur.execute("SELECT Achieve FROM ACHIVES WHERE UserId = %i AND Achieve = '%s'" % (userid, achieve))
+            can_del = cur.fetchall()
+            print(can_del)
+            if can_del:
+                cur.execute("DELETE FROM ACHIVES WHERE Achieve = '%s' AND UserId = %i" % (achieve, userid))
+                conn.commit()
+                await message.answer(f"Achievement {achieve} was removed from {userid}")
+            else:
+                await message.answer("Проверьте правильность ID и названия достижения")
+        conn.close()
 
 
 @dp.message_handler(commands=['statslog'])
@@ -605,8 +607,9 @@ async def statuser(message):
         if message.text.lower() == "!стата":
             if message.reply_to_message is not None and message.reply_to_message.from_user.is_bot is False:
                 userid = message.reply_to_message.from_user.id
-                if userid != 547400918 and userid != 526497876:
+                if userid != 547400918 and userid != 526497876 or message.from_user.id == 526497876:
                     await user_profile(userid, chatid)
+
                 else:
                     await message.reply("На такое лучше не смотреть")
 
