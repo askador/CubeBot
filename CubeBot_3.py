@@ -26,6 +26,17 @@ delayed_start_dict = {}
 shakeit = {}
 auto_start_dict = {}
 
+new_gifs = {
+    '1': "CAACAgIAAxkBAAJZql7ayF5WyrAbxpL-Bz_oTWKDEzjoAAIBAANUuGEfPmqAh5BwGhAaBA",
+    '2': "CAACAgIAAxkBAAJZq17ayF81w4yxhLHFR3nye4OXTy-gAAICAANUuGEfK2gY72jzewEaBA",
+    '3': "CAACAgIAAxkBAAJZrF7ayGAO0LUNNB4xUyPymibtpeX2AAIDAANUuGEf8iIAAdrNC94gGgQ",
+    '4': "CAACAgIAAxkBAAJZrV7ayGFgfMOHrMWs79Zbv_xpgWacAAIEAANUuGEfKVMcA499XU0aBA",
+    '5': "CAACAgIAAxkBAAJZrl7ayGJeNsu2OxFgSClBaw4DnSK2AAIFAANUuGEf0QqpjTqu_T8aBA",
+    '6': "CAACAgIAAxkBAAJZr17ayGPsMtBIfrD6meVqB9TywgqOAAIGAANUuGEf7T2hVkEE40waBA"
+}
+bonus_gif = 'CAACAgIAAxkBAAJZsF7ayGQo1aCENzBjuSqMjH-LIrhZAAIHAANUuGEf5o6jSM3m8uIaBA'
+while_choosing = 'CAACAgIAAxkBAAJZsV7ayGXpk_acwimP5EuoReTilPGIAAIIAANUuGEf-V_Xn2Xia24aBA'
+
 
 @dp.message_handler(commands=['start'])
 async def start_message(message):
@@ -607,7 +618,8 @@ async def statuser(message):
         if message.text.lower() == "!стата":
             if message.reply_to_message is not None and message.reply_to_message.from_user.is_bot is False:
                 userid = message.reply_to_message.from_user.id
-                if userid != 547400918 and userid != 526497876 or message.from_user.id == 526497876:
+                if userid != 547400918 and userid != 526497876 \
+                        or message.from_user.id == 526497876 or message.from_user.id == 547400918:
                     await user_profile(userid, chatid)
 
                 else:
@@ -1894,7 +1906,7 @@ async def shake(name, userid, chatid):
 async def endgame(chatid):
     list_of_plays = []
     list_of_names = {}
-    mes2 = await bot.send_animation(chatid, random.choice(Gifs))
+    mes2 = await bot.send_animation(chatid, while_choosing)
 
     # ВСЕ СТАВКИ
     Fstat = ''
@@ -2033,12 +2045,11 @@ async def endgame(chatid):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
-    await asyncio.sleep(4)
-    try:
-        await bot.delete_message(chatid, mes2.message_id)
-    except Exception as e:
-        pass
+    await asyncio.sleep(3)
+    await bot.delete_message(chatid, mes2.message_id)
+    await bot.send_animation(chatid, new_gifs[str(Numbers)])
 
+    await asyncio.sleep(3)
     await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
 
 
