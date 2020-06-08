@@ -8,7 +8,7 @@ import random
 import datetime
 import time
 
-from aiogram.utils.exceptions import Unauthorized, MessageError, TerminatedByOtherGetUpdates
+from aiogram.utils.exceptions import BadRequest, ConflictError, Unauthorized, RetryAfter
 
 bot = Bot(token='996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo', parse_mode='HTML')
 storage = MemoryStorage()
@@ -97,24 +97,23 @@ async def rules_for_player(message):
 async def help_for_player(message):
     if message.from_user.id == message.chat.id:
         await message.answer("<b>Игровые команды:</b>\n\n"
-                             "<b>Кости</b> - запустить игру\n"
-                             "<b>Трясти</b> - бросить кубик\n"
-                             "<b>Отмена</b> - отмена ставок\n"
-                             "<b>Лавэ</b> - зырнуть наличные\n"
-                             "<b>Бонус</b> - забрать бонус (раз в 2 часа)\n"
-                             "<b>Ставки</b> - зырнуть шо поставил\n"
-                             "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n"
-                             "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n"
-                             "<b>!рейтинг | !рейтинг 10</b> - рейтинг игроков\n"
-                             "<b>!стата</b> - личная статистика\n"
+                             "<b>Кости</b> - запустить игру\n\n"
+                             "<b>Трясти</b> - бросить кубик\n\n"
+                             "<b>Отмена</b> - отмена ставок\n\n"
+                             "<b>Лавэ</b> - зырнуть наличные\n\n"
+                             "<b>Бонус</b> - забрать бонус (раз в 2 часа)\n\n"
+                             "<b>Ставки</b> - зырнуть шо поставил\n\n"
+                             "<b>логи</b> - зырнуть на историю выпадения чисел(10 значений)\n\n"
+                             "<b>+г [сколько] (ответ на смс в чатах)</b> - передать денюжку\n\n"
+                             "<b>!рейтинг | !рейтинг 10</b> - рейтинг игроков\n\n"
+                             "<b>!стата</b> - личная статистика\n\n"
                              "<b>!раздача [сколько]</b> - раздача лавэ (раз в час, не меньше 100 000"
-                             " и не больше 10 000 000 000)\n"
-                             "<b>%п</b> - повторить ставку с прошлой игры\n"
-                             "<b>%у</b> - удвоить ставки\n"
-                             "\n"
-                             "<b>Над ботом работали:</b>\n"
-                             "<a href='tg://user?id=526497876'><b>Серый</b></a> и "
-                             "<a href='tg://user?id=547400918'><b>Миша</b></a>")
+                             " и не больше 10 000 000 000)\n\n"
+                             "<b>%п</b> - повторить ставку с прошлой игры\n\n"
+                             "<b>%у</b> - удвоить ставки\n\n"
+                             "\n\n"
+                             "<b>Автор идеи:</b><a href='tg://user?id=547400918'><b>Миша</b></a>\n"
+                             "<b>Directed by:</b><a href='tg://user?id=526497876'><b>Серый</b></a>")
     else:
         await message.reply("Используйте эту команду в личке с ботом")
 
@@ -240,7 +239,7 @@ async def stats(message):
     conn.close()
 
 
-@dp.message_handler(commands=['setmoney'])
+@dp.message_handler(regexp='!добавить ([0-9]+)')
 async def setmoney(message):
     conn = psycopg2.connect(
         "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
@@ -1110,6 +1109,7 @@ async def process_callback_game_buttons(callback_query: types.CallbackQuery):
 
 #  processing bonus callback
 @dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'Бросить')
+@dp.throttled(rate=1.2)
 async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
     userid = callback_query.from_user.id
@@ -1152,6 +1152,7 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
 
 #  processing bonus second click step callback  --> def coef()
 @dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'Бросить1')
+@dp.throttled(rate=1.2)
 async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
     userid = callback_query.from_user.id
@@ -1257,6 +1258,7 @@ async def coef(bonnum, userid):
 
 
 @dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'Бросить2')
+@dp.throttled(rate=1.2)
 async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
     userid = callback_query.from_user.id
@@ -1537,7 +1539,7 @@ async def double_bet(message):
 @dp.message_handler(regexp="(^[+][г])([' ']*)(\d)")
 async def transfer_money(message):
     try:
-        if 0 < int(''.join(message.text[2:].split())) < 10 ** 18 and message.reply_to_message is not None:
+        if 0 < int(''.join(message.text[2:].split(','))) < 10 ** 18 and message.reply_to_message is not None:
             name = message.from_user.first_name
             lastname = message.from_user.last_name
             username = message.from_user.username
@@ -1550,7 +1552,7 @@ async def transfer_money(message):
                     "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
                 cur = conn.cursor()
                 if message.reply_to_message.from_user.is_bot is False:
-                    howmuch = int(''.join(message.text[2:].split()))
+                    howmuch = int(''.join(message.text[2:].split(',')))
                     whoid = message.reply_to_message.from_user.id
                     whoname = message.reply_to_message.from_user.first_name
                     wholastname = message.reply_to_message.from_user.last_name
@@ -1601,70 +1603,72 @@ async def chekbet(message: types.Message):
         await message.reply("Oops. something went wrong. Try again.")
     else:
         #   ПРОВЕРКА НА СТАВКУ
-        if Game is True:
-            try:
-                if shakeit[chatid] is False:
-                    text = message.text
-                    name = message.from_user.first_name
-                    lastname = message.from_user.last_name
-                    username = message.from_user.username
-                    userid = message.from_user.id
-                    await alldataUSERS(name, lastname, username, userid, chatid)
+        text = message.text
+        if len(text.split()) == 2:
+            if Game is True:
+                try:
+                    if shakeit[chatid] is False:
+                        name = message.from_user.first_name
+                        lastname = message.from_user.last_name
+                        username = message.from_user.username
+                        userid = message.from_user.id
+                        await alldataUSERS(name, lastname, username, userid, chatid)
 
-                    # ПРОВЕРКА НА СТАВКУ
-                    # ЕСЛИ ЗАПИСЬ 100 2
-                    try:
-                        if len(text.split()) == 2 and (text.split()[0]).isdigit() and (text.split()[1]).isdigit() \
-                                and 0 < int(text.split()[0]) < 10 ** 18 and 0 < int(text.split()[1]) <= 6:
-                            bet = int(text.split()[0])
-                            num = str(text.split()[-1])
+                        # ЕСЛИ ЗАПИСЬ 100 2
+                        try:
+                            if (''.join((text.split()[0]).split(','))).isdigit() and (text.split()[1]).isdigit() \
+                                    and 0 < int((''.join((text.split()[0]).split(','))).isdigit()) < 10 ** 18 \
+                                    and 0 < int(text.split()[1]) <= 6:
+                                bet = int(''.join((text.split()[0]).split(',')))
+                                num = str(text.split()[-1])
 
-                            #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-                            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-                            groshi = cur.fetchall()[0][0]
-                            if groshi >= bet:
-                                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                                #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
+                                cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+                                groshi = cur.fetchall()[0][0]
+                                if groshi >= bet:
+                                    await confirmbets(name, lastname, username, userid, chatid, num, bet)
 
-                            else:
-                                mes1 = await bot.send_message(chatid, "<a href='tg://user?id=%i'>%s</a>, нету столько" %
-                                                              (userid, name))
-                                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                                            (chatid, mes1.message_id))
-                                conn.commit()
+                                else:
+                                    mes1 = await bot.send_message(chatid, "<a href='tg://user?id=%i'>%s</a>, нету столько" %
+                                                                  (userid, name))
+                                    cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                                                (chatid, mes1.message_id))
+                                    conn.commit()
 
-                    except Exception as e:
-                        pass
+                        except Exception as e:
+                            pass
 
-                    # ЕСЛИ ЗАПИСЬ 100 2 - 4
-                    try:
-                        if len(text.split()) == 2 and (text.split()[0]).isdigit() \
-                                and 0 < int(text.split()[0]) < 10 ** 18 \
-                                and (text.split()[1].split("-")[0]).isdigit() \
-                                and (text.split()[1].split("-")[1]).isdigit() \
-                                and 0 < (int(text.split()[1].split("-")[0])) < (
-                                int(text.split()[1].split("-")[1])) <= 6:
+                        # ЕСЛИ ЗАПИСЬ 100 2 - 4
+                        try:
+                            if (''.join((text.split()[0]).split(','))).isdigit() \
+                                    and 0 < int((''.join((text.split()[0]).split(','))).isdigit()) < 10 ** 18 \
+                                    and (text.split()[1].split("-")[0]).isdigit() \
+                                    and (text.split()[1].split("-")[1]).isdigit() \
+                                    and 0 < (int(text.split()[1].split("-")[0])) < (
+                                    int(text.split()[1].split("-")[1])) <= 6:
 
-                            bet = int(text.split()[0])
-                            num = text.split()[-1]
+                                bet = int(''.join((text.split()[0]).split(',')))
+                                num = str(text.split()[-1])
 
-                            #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
-                            cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
-                            groshi = cur.fetchall()[0][0]
-                            if groshi >= bet:
-                                await confirmbets(name, lastname, username, userid, chatid, num, bet)
+                                #    ПРОВЕРКА НА СОСТОЯТЕЛЬНОСТЬ
+                                cur.execute("SELECT Money FROM USERS WHERE UserId = '%i'" % userid)
+                                groshi = cur.fetchall()[0][0]
+                                if groshi >= bet:
+                                    await confirmbets(name, lastname, username, userid, chatid, num, bet)
 
-                            else:
-                                mes1 = await message.answer(
-                                    "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
-                                cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
-                                            (chatid, mes1.message_id))
-                                conn.commit()
+                                else:
+                                    mes1 = await message.answer(
+                                        "<a href='tg://user?id=%i'>%s</a>, нету столько" % (userid, name))
+                                    cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                                                (chatid, mes1.message_id))
+                                    conn.commit()
 
-                    except Exception as e:
-                        pass
-            except Exception as e:
-                await message.reply("Oops. something went wrong. Try again.")
-                shakeit.update([(chatid, False)])
+                        except Exception as e:
+                            pass
+
+                except Exception as e:
+                    await message.reply("Oops. something went wrong. Try again.")
+                    shakeit.update([(chatid, False)])
         conn.close()
 
 
@@ -2302,8 +2306,9 @@ async def algoritm(chatid):
 
 
 @dp.errors_handler(exception=Unauthorized)
-@dp.errors_handler(exception=TerminatedByOtherGetUpdates)
-@dp.errors_handler(exception=MessageError)
+@dp.errors_handler(exception=BadRequest)
+@dp.errors_handler(exception=ConflictError)
+@dp.errors_handler(exception=RetryAfter)
 async def error_handler(update, e):
     print(e)
     return True
