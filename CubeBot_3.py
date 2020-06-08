@@ -112,8 +112,8 @@ async def help_for_player(message):
                              "<b>%п</b> - повторить ставку с прошлой игры\n\n"
                              "<b>%у</b> - удвоить ставки\n\n"
                              "\n\n"
-                             "<b>Автор идеи:</b><a href='tg://user?id=547400918'><b>Миша</b></a>\n"
-                             "<b>Directed by:</b><a href='tg://user?id=526497876'><b>Серый</b></a>")
+                             "<b>Автор идеи: </b><a href='tg://user?id=547400918'><b>Миша</b></a>\n"
+                             "<b>Создатель: </b><a href='tg://user?id=526497876'><b>Серый</b></a>")
     else:
         await message.reply("Используйте эту команду в личке с ботом")
 
@@ -239,7 +239,7 @@ async def stats(message):
     conn.close()
 
 
-@dp.message_handler(regexp='!добавить ([0-9]+)')
+@dp.message_handler(commands=['setmoney'])
 async def setmoney(message):
     conn = psycopg2.connect(
         "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
