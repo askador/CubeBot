@@ -14,7 +14,6 @@ bot = Bot(token='996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo', parse_mode='HTM
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-
 Gifs = ['CgACAgQAAxkBAAIYLV6jKaDrig_qR_Vgw_AvQgGuruadAAItAgAC5N51UOsPf1ouSS4zGQQ',
         'CgACAgQAAxkBAAIYLl6jKaIkGk1Evh4-e8Xy6wQyux-DAAJaAgACb7ntUutpUszjF0COGQQ',
         'CgACAgIAAxkBAAIYL16jKabyMhMqejWNaXKYnD9ejG6JAAJiBAACn94RSMkn7AO4qNgMGQQ',
@@ -989,6 +988,7 @@ async def scores(callback_query: types.CallbackQuery):
     conn.close()
 
 
+
 @dp.message_handler(regexp='!раздача ([0-9]+)')
 async def giveaway(message):
     userid = message.from_user.id
@@ -1015,7 +1015,7 @@ async def giveaway(message):
                         cur.execute(f"CREATE TABLE GIVEAWAY{abs(chatid)}("
                                     "Id Serial,"
                                     "UserId              BIGINT,"
-                                    "How_many               INT,"
+                                    "How_many            BIGINT,"
                                     "FullName              TEXT,"
                                     "value                  INT,"
                                     "PRIMARY KEY(Id))")
@@ -2047,7 +2047,7 @@ async def achieves_bonus(bonnums, userid):
 async def max_win(userid, prize):
     # "Волк с Уолл-стрит"
     mess = []
-    if prize > 10**12:
+    if prize >= 10**12:
         conn = psycopg2.connect(
             "postgres://ldecbdhgnzovuk:223d4e6aeda20ddca3d72f25d4557040ef6b05616a959788096c193d5f70e61b"
             "@ec2-34-197-188-147.compute-1.amazonaws.com:5432/db5fuj6d41dpo6")
