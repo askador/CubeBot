@@ -2279,7 +2279,7 @@ async def endgame(chatid, userid):
         WINstat = 'Вах, никто нэ выиграл'
 
 
-    if userid == chatid:
+    if userid != chatid:
         await bot.send_animation(chatid, new_gifs[str(Numbers)])
         await asyncio.sleep(3)
 
