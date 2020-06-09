@@ -2101,7 +2101,7 @@ async def shake(name, userid, chatid):
         pass
 
     #   ВЫГРУЗКА ВСЕХ СТАВОК
-    await endgame(chatid, userid)
+    await endgame(chatid)
 
     # -------------------------------
 
@@ -2115,7 +2115,7 @@ async def shake(name, userid, chatid):
     conn.close()
 
 
-async def endgame(chatid, userid):
+async def endgame(chatid):
     list_of_plays = []
     list_of_names = {}
     Wonmaxnum = []
@@ -2279,7 +2279,7 @@ async def endgame(chatid, userid):
         WINstat = 'Вах, никто нэ выиграл'
 
 
-    if userid != chatid:
+    if str(chatid).startswith('-100'):
         await bot.send_animation(chatid, new_gifs[str(Numbers)])
         await asyncio.sleep(3)
 
