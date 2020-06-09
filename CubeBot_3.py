@@ -138,10 +138,13 @@ async def achieve(message):
             await message.answer(f"Achievement {achieve} was added to {userid}")
             cur.execute("SELECT Name, LastName FROM Users WHERE UserID = %i" % userid)
             name = cur.fetchall()
-            name = name[0][0] + ' ' + name[0][1]
+            if name[0][1] != "None":
+                name = name[0][0] + ' ' + name[0][1]
+            else:
+                name = name[0][0]
             await bot.send_message(userid, f"⭐️ Сириус стал ярче\nКукушка услышала пение\n{name} получает достижение"
                                             f"\n"
-                                            f"{achieve}")
+                                            f"<b>{achieve}</b>")
 
 
 @dp.message_handler(regexp="!у достижение ([0-9]+)")
