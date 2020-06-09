@@ -142,9 +142,10 @@ async def achieve(message):
                 name = name[0][0] + ' ' + name[0][1]
             else:
                 name = name[0][0]
-            await bot.send_message(userid, f"⭐️ Сириус стал ярче\nКукушка услышала пение\n{name} получает достижение"
-                                            f"\n"
-                                            f"<b>{achieve}</b>")
+            await bot.send_message(userid, "Сириус стал ярче")
+            await bot.send_message(userid, "Кукушка услышала пение")
+            await bot.send_message(userid, f"{name} получает достижение\n"
+                                           f"<b>{achieve}</b>")
 
 
 @dp.message_handler(regexp="!у достижение ([0-9]+)")
