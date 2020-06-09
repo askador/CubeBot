@@ -136,6 +136,12 @@ async def achieve(message):
         else:
             conn.commit()
             await message.answer(f"Achievement {achieve} was added to {userid}")
+            cur.execute("SELECT Name, LastName FROM Users WHERE UserID = %i" % userid)
+            name = cur.fetchall()
+            name = name[0][0] + ' ' + name[0][1]
+            await bot.send_message(userid, f"⭐️ Сириус стал ярче\nКукушка услышала пение\n{name} получает достижение"
+                                            f"\n"
+                                            f"{achieve}")
 
 
 @dp.message_handler(regexp="!у достижение ([0-9]+)")
