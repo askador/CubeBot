@@ -111,7 +111,7 @@ async def help_for_player(message):
                              " и не больше 10 000 000 000)\n\n"
                              "<b>%п</b> - повторить ставку с прошлой игры\n\n"
                              "<b>%у</b> - удвоить ставки\n\n"
-                             "\n\n"
+                             "\n"
                              "<b>Автор идеи: </b><a href='tg://user?id=547400918'><b>Миша</b></a>\n"
                              "<b>Создатель: </b><a href='tg://user?id=526497876'><b>Серый</b></a>")
     else:
@@ -1017,7 +1017,7 @@ async def giveaway(message):
                                     "How_many            BIGINT,"
                                     "FullName              TEXT,"
                                     "value                  INT,"
-                                    "PRIMARY KEY(Id))")
+                                    "PRIMARY KEY(Id));")
                     except Exception as e:
                         conn.close()
                         await message.reply("Раздача лавэ уже начата")
@@ -2101,7 +2101,7 @@ async def shake(name, userid, chatid):
         pass
 
     #   ВЫГРУЗКА ВСЕХ СТАВОК
-    await endgame(chatid)
+    await endgame(chatid, userid)
 
     # -------------------------------
 
@@ -2115,11 +2115,10 @@ async def shake(name, userid, chatid):
     conn.close()
 
 
-async def endgame(chatid):
+async def endgame(chatid, userid):
     list_of_plays = []
     list_of_names = {}
     Wonmaxnum = []
-    mes2 = await bot.send_animation(chatid, while_choosing)
 
     # ВСЕ СТАВКИ
     Fstat = ''
@@ -2279,12 +2278,14 @@ async def endgame(chatid):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
-    await asyncio.sleep(2)
-    await bot.delete_message(chatid, mes2.message_id)
-    await bot.send_animation(chatid, new_gifs[str(Numbers)])
 
-    await asyncio.sleep(3)
-    await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
+    if userid == chatid:
+        await bot.send_animation(chatid, new_gifs[str(Numbers)])
+        await asyncio.sleep(3)
+
+        await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
+    else:
+        await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
 
 
 #  choosing number of cube
