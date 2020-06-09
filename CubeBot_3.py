@@ -143,9 +143,9 @@ async def achieve(message):
             else:
                 name = name[0][0]
             await bot.send_message(userid, "Сириус стал ярче")
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(2)
             await bot.send_message(userid, "Кукушка услышала пение")
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(2)
             await bot.send_message(userid, f"{name} получает достижение\n"
                                            f"<b>{achieve}</b>")
 
