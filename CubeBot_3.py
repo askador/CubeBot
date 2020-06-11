@@ -1774,8 +1774,8 @@ async def alldataCHAT(chatid, title, date):
         cur.execute("SELECT count(Title) From Stats WHERE Title = '%s'" % title)
         title_count = cur.fetchall()[0][0]
         if title_count < 1:
-            cur.execute("INSERT INTO Stats (Title, IdChat, Plays, Won, Lost, Bets_num) "
-                        "VALUES ('%s', '%i', 0, 0, 0, 0)" % (title, chatid))
+            cur.execute("INSERT INTO Stats (Title, IdChat, Plays, Won, Lost, Bets_num, Last_activity) "
+                        "VALUES ('%s', '%i', 0, 0, 0, 0, '%s')" % (title, chatid, date))
         else:
             cur.execute("UPDATE Stats set Title = '%s', Last_activity = '%s' WHERE IdChat = '%i'" % (title, date, chatid))
     except Exception as e:
