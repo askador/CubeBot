@@ -29,6 +29,12 @@ shakeit = {}
 auto_start_dict = {}
 
 
+@dp.message_handler(lambda msg: msg.from_user.id == 526497876)
+@dp.message_handler(content_types=types.ContentTypes.ANIMATION)
+def my_mes(message):
+    await message.reply(message)
+
+
 @dp.message_handler(commands=['start'])
 async def start_message(message):
     await bot.send_message(message.chat.id, "Временные технические шоколадки...")
