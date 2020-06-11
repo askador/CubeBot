@@ -31,7 +31,7 @@ auto_start_dict = {}
 
 @dp.message_handler(lambda msg: msg.from_user.id == 526497876)
 @dp.message_handler(content_types=types.ContentTypes.ANIMATION)
-def my_mes(message):
+async def my_mes(message):
     await message.reply(message)
 
 
