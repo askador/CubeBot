@@ -5,10 +5,10 @@ from aiogram.dispatcher import Dispatcher
 import psycopg2
 import asyncio
 import random
-import datetime
+from datetime import datetime
 import time
 
-from aiogram.utils.exceptions import BadRequest, ConflictError, Unauthorized, RetryAfter
+from aiogram.utils.exceptions import TelegramAPIError
 
 bot = Bot(token='996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo', parse_mode='HTML')
 storage = MemoryStorage()
@@ -294,7 +294,7 @@ async def stats(message):
 async def stats_rollback(message):
     try:
         if message.text.split()[2] == "все":
-            cur.execute("UPDATE STATS set Plays = 0, Won = 0, Lost = 0, Bets_Num = 0 WHERE Bets_Num > 0")
+            cur.execute("UPDATE STATS set Plays = 0, Won = 0, Lost = 0, Bets_Num = 0")
             await message.answer("Все сброшено")
     except Exception as e:
         conn.rollback()
@@ -394,7 +394,7 @@ async def start_game(message):
         title = message.chat.title
     else:
         title = message.chat.first_name
-    date = str(message.date)
+    date = str(datetime.fromtimestamp(message.date.timestamp() + 10800))
     await alldataCHAT(chatid, title, date)
     await alldataUSERS(name, lastname, username, userid, chatid)
 
@@ -618,7 +618,7 @@ async def logsgame(message):
     else:
         title = message.chat.first_name
 
-    date = str(message.date)
+    date = str(datetime.fromtimestamp(message.date.timestamp() + 10800))
     await alldataCHAT(chatid, title, date)
 
 
@@ -656,7 +656,7 @@ async def bonus(message):
         ostalos = bonustime - message.date.timestamp()
 
         if bonuserid != 526497876 and bonuserid != 547400918 and ostalos > 0:
-            value = datetime.datetime.fromtimestamp(ostalos).strftime('%H:%M:%S')
+            value = datetime.fromtimestamp(ostalos).strftime('%H:%M:%S')
             await message.reply("Бонусное лавэ можно получить через %s" % value)
 
         elif bonuserid == 526497876 or bonuserid == 547400918 or bonustime == 0 or ostalos <= 0:
@@ -912,7 +912,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             f"Правила:\n"
             f"Нажимайте на кнопку, набирайте больше всех очков\n"
             f"Награда распределится по количеству набранных очков\n"
-            f"Раздача лавэ через {datetime.datetime.fromtimestamp(start_in).strftime('%M:%S')}"
+            f"Раздача лавэ через {datetime.fromtimestamp(start_in).strftime('%M:%S')}"
             f"\n\n"
             f"{list_for_giveaway}",
                                         reply_markup=giveaway_bt_procc)
@@ -1771,7 +1771,7 @@ async def alldataCHAT(chatid, title, date):
         conn.commit()
 
     try:
-        cur.execute("SELECT count(Title) From Stats WHERE Title = '%s'" % title)
+        cur.execute("SELECT count(IdChat) From Stats WHERE IdChat = '%i'" % chatid)
         title_count = cur.fetchall()[0][0]
         if title_count < 1:
             cur.execute("INSERT INTO Stats (Title, IdChat, Plays, Won, Lost, Bets_num, Last_activity) "
@@ -2170,6 +2170,7 @@ async def endgame(chatid):
     for i in range(len(list_of_plays)):
         cur.execute("UPDATE USERS set Plays = Plays + 1 WHERE UserId = %i" % list_of_plays[i])
         conn.commit()
+        # achievements
         try:
             plays = await achieves_plays(list_of_plays[i])
             for k in range(len(plays)):
@@ -2223,6 +2224,7 @@ async def endgame(chatid):
 async def algoritm(chatid, date):
     # Number = np.random.randint(1, 7, 1)[0]
     Number = int(date % 6 + 1)
+
     namedb = 'logchat' + str(abs(chatid))
     cur.execute("INSERT INTO %s (Log) VALUES (%i)" % (namedb, Number))
     conn.commit()
@@ -2233,10 +2235,7 @@ async def algoritm(chatid, date):
         conn.commit()
 
 
-@dp.errors_handler(exception=Unauthorized)
-@dp.errors_handler(exception=BadRequest)
-@dp.errors_handler(exception=ConflictError)
-@dp.errors_handler(exception=RetryAfter)
+@dp.errors_handler(exception=TelegramAPIError)
 async def error_handler(update, e):
     print(e)
     return True
