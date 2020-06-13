@@ -664,7 +664,12 @@ async def bonus(message):
             bonusik = types.InlineKeyboardButton(text='Бросить', callback_data="Бросить")
             keybonus.add(bonusik)
 
-            lavebonus = int(random.randrange(1500, 2500))
+            cur.execute("SELECT Money From USERS Where UserId = %i" % bonuserid)
+            money = cur.fetchall()[0][0]
+            if money > 10000000:        # 10 000 000
+                lavebonus = int(random.randrange(15000, 25000))
+            else:
+                lavebonus = int(random.randrange(1500, 2500))
 
             numbonus = ''.join([str(np.random.randint(1, 7, 1)[0]) for i in range(3)])
 
@@ -1116,21 +1121,24 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
         pass
     else:
         if bonususermes == mesid:
-            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-            paluchi = cur.fetchall()[0][0]
-
-            cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
-            bonnums = cur.fetchall()[0][0]
-
             try:
-                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                            text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                                 "Лавэ %s, коеффициент = %.1f\n\n"
-                                                 "             <b>%s</b> : 🎲 : 🎲 \n" %
-                                                 (userid, name, paluchi, 1, bonnums[0]), reply_markup=keybonus)
-                await bot.answer_callback_query(callback_query.id)
-            except Exception as e:
+                cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                paluchi = cur.fetchall()[0][0]
+
+                cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
+                bonnums = cur.fetchall()[0][0]
+            except Exception:
                 pass
+            else:
+                try:
+                    await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                                text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                                     "Лавэ %s, коеффициент = %.1f\n\n"
+                                                     "             <b>%s</b> : 🎲 : 🎲 \n" %
+                                                     (userid, name, paluchi, 1, bonnums[0]), reply_markup=keybonus)
+                    await bot.answer_callback_query(callback_query.id)
+                except Exception as e:
+                    pass
         else:
             await callback_query.answer("Не твоё")
 
@@ -1151,32 +1159,35 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     try:
         cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % userid)
         bonususermes = cur.fetchall()[0][0]
-    except Exception:
+    except Exception as e:
         pass
     else:
         if bonususermes == mesid:
-            cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
-            bonnums2 = cur.fetchall()[0][0]
-
             try:
-                if bonnums2[0] == bonnums2[1]:
-                    await coef(bonnums2[0], userid)
-
-                cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
-                paluchi3 = cur.fetchall()[0][0]
-
-                cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
-                boncoef = cur.fetchall()[0][0]
-
-                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                            text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                                 "Лавэ %s, коеффициент = %.1f\n\n"
-                                                 "               <b>%s</b> : <b>%s</b> : 🎲 \n" %
-                                                 (userid, name, paluchi3, boncoef, bonnums2[0], bonnums2[1]),
-                                            reply_markup=keybonus1)
-                await bot.answer_callback_query(callback_query.id)
-            except Exception:
+                cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
+                bonnums2 = cur.fetchall()[0][0]
+            except Exception as e:
                 pass
+            else:
+                try:
+                    if bonnums2[0] == bonnums2[1]:
+                        await coef(bonnums2[0], userid)
+
+                    cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
+                    paluchi3 = cur.fetchall()[0][0]
+
+                    cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
+                    boncoef = cur.fetchall()[0][0]
+
+                    await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                                text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                                     "Лавэ %s, коеффициент = %.1f\n\n"
+                                                     "               <b>%s</b> : <b>%s</b> : 🎲 \n" %
+                                                     (userid, name, paluchi3, boncoef, bonnums2[0], bonnums2[1]),
+                                                reply_markup=keybonus1)
+                    await bot.answer_callback_query(callback_query.id)
+                except Exception:
+                    pass
 
         else:
             await callback_query.answer("Не твоё")
@@ -1253,109 +1264,112 @@ async def process_callback_bonus_buttons(callback_query: types.CallbackQuery):
     else:
         if bonususermes == mesid:
 
-            cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
-            bonnums3 = cur.fetchall()[0][0]
-
             try:
-                if bonnums3[0] == bonnums3[2] or bonnums3[1] == bonnums3[2] and len(list(set(bonnums3))) != 1:
-                    await coef(bonnums3[2], userid)
-
-                if len(list(set(bonnums3))) == 1:
-                    if bonnums3[0] == '1':
-                        mnozitel2 = 25
-                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                        paluchi5 = cur.fetchall()[0][0]
-                        paluchi5 = paluchi5 * mnozitel2
-                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                        conn.commit()
-                    elif bonnums3[0] == '2':
-                        mnozitel2 = 28
-                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                        paluchi5 = cur.fetchall()[0][0]
-                        paluchi5 = paluchi5 * mnozitel2
-                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                        conn.commit()
-                    elif bonnums3[0] == '3':
-                        mnozitel2 = 33
-                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                        paluchi5 = cur.fetchall()[0][0]
-                        paluchi5 = paluchi5 * mnozitel2
-                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                        conn.commit()
-                    elif bonnums3[0] == '4':
-                        mnozitel2 = 38
-                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                        paluchi5 = cur.fetchall()[0][0]
-                        paluchi5 = paluchi5 * mnozitel2
-                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                        conn.commit()
-                    elif bonnums3[0] == '5':
-                        mnozitel2 = 45
-                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                        paluchi5 = cur.fetchall()[0][0]
-                        paluchi5 = paluchi5 * mnozitel2
-                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                        conn.commit()
-                    elif bonnums3[0] == '6':
-                        mnozitel2 = 50
-                        cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
-
-                        cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
-                        paluchi5 = cur.fetchall()[0][0]
-                        paluchi5 = paluchi5 * mnozitel2
-                        cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
-                        conn.commit()
-
-                cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
-                paluchi0 = cur.fetchall()[0][0]
-
-                cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (paluchi0, userid))
-                conn.commit()
-                await check_limit_money(userid)
-
-                cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
-                boncoef5 = cur.fetchall()[0][0]
-
-                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                            text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
-                                                 "Лавэ %s, коеффициент = %.1f\n\n"
-                                                 "               <b>%s</b> : <b>%s</b> : <b>%s</b> \n" %
-                                                 (userid, name, paluchi0, boncoef5, bonnums3[0], bonnums3[1],
-                                                  bonnums3[2]),
-                                            reply_markup=keybonus2)
-
-                await bot.answer_callback_query(callback_query.id)
-
-                try:
-                    bonus_achievement = await achieves_bonus(bonnums3, userid)
-                    for i in range(len(bonus_achievement)):
-                        gift = bonus_achievement[i][1]
-                        title = bonus_achievement[i][0]
-                        await bot.send_message(chatid, f"⭐️ {name} получает достижение "
-                        f"\n<b>{title}</b>\n"
-                        f"Держи награду +{gift}")
-                except Exception as e:
-                    pass
-
-                await asyncio.sleep(2)
-                await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
-                                            text="<a href='tg://user?id=%i'>%s</a> забирает свой бонус %s " %
-                                                 (userid, name, paluchi0))
-
-                cur.execute("DELETE FROM BONUS WHERE UserId = %i" % userid)
-                conn.commit()
+                cur.execute("SELECT bonnums from bonus where userid = %i" % userid)
+                bonnums3 = cur.fetchall()[0][0]
             except Exception:
                 pass
+            else:
+                try:
+                    if bonnums3[0] == bonnums3[2] or bonnums3[1] == bonnums3[2] and len(list(set(bonnums3))) != 1:
+                        await coef(bonnums3[2], userid)
+
+                    if len(list(set(bonnums3))) == 1:
+                        if bonnums3[0] == '1':
+                            mnozitel2 = 25
+                            cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                            paluchi5 = cur.fetchall()[0][0]
+                            paluchi5 = paluchi5 * mnozitel2
+                            cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                            conn.commit()
+                        elif bonnums3[0] == '2':
+                            mnozitel2 = 28
+                            cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                            paluchi5 = cur.fetchall()[0][0]
+                            paluchi5 = paluchi5 * mnozitel2
+                            cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                            conn.commit()
+                        elif bonnums3[0] == '3':
+                            mnozitel2 = 33
+                            cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                            paluchi5 = cur.fetchall()[0][0]
+                            paluchi5 = paluchi5 * mnozitel2
+                            cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                            conn.commit()
+                        elif bonnums3[0] == '4':
+                            mnozitel2 = 38
+                            cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                            paluchi5 = cur.fetchall()[0][0]
+                            paluchi5 = paluchi5 * mnozitel2
+                            cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                            conn.commit()
+                        elif bonnums3[0] == '5':
+                            mnozitel2 = 45
+                            cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                            paluchi5 = cur.fetchall()[0][0]
+                            paluchi5 = paluchi5 * mnozitel2
+                            cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                            conn.commit()
+                        elif bonnums3[0] == '6':
+                            mnozitel2 = 50
+                            cur.execute("UPDATE BONUS set BONCOEF = %f WHERE UserId = %i" % (mnozitel2, userid))
+
+                            cur.execute("SELECT START_LAVE FROM BONUS WHERE UserId = %i" % userid)
+                            paluchi5 = cur.fetchall()[0][0]
+                            paluchi5 = paluchi5 * mnozitel2
+                            cur.execute("UPDATE BONUS set LAVE = %i WHERE UserId = %i" % (paluchi5, userid))
+                            conn.commit()
+
+                    cur.execute("SELECT LAVE FROM BONUS WHERE UserId = %i" % userid)
+                    paluchi0 = cur.fetchall()[0][0]
+
+                    cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (paluchi0, userid))
+                    conn.commit()
+                    await check_limit_money(userid)
+
+                    cur.execute("SELECT BONCOEF FROM BONUS WHERE UserId = %i" % userid)
+                    boncoef5 = cur.fetchall()[0][0]
+
+                    await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                                text="<a href='tg://user?id=%s'>%s</a> бросай кубики\nУвеличивай бонус\n\n"
+                                                     "Лавэ %s, коеффициент = %.1f\n\n"
+                                                     "               <b>%s</b> : <b>%s</b> : <b>%s</b> \n" %
+                                                     (userid, name, paluchi0, boncoef5, bonnums3[0], bonnums3[1],
+                                                      bonnums3[2]),
+                                                reply_markup=keybonus2)
+
+                    await bot.answer_callback_query(callback_query.id)
+
+                    try:
+                        bonus_achievement = await achieves_bonus(bonnums3, userid)
+                        for i in range(len(bonus_achievement)):
+                            gift = bonus_achievement[i][1]
+                            title = bonus_achievement[i][0]
+                            await bot.send_message(chatid, f"⭐️ {name} получает достижение "
+                            f"\n<b>{title}</b>\n"
+                            f"Держи награду +{gift}")
+                    except Exception as e:
+                        pass
+
+                    await asyncio.sleep(2)
+                    await bot.edit_message_text(chat_id=chatid, message_id=bonususermes,
+                                                text="<a href='tg://user?id=%i'>%s</a> забирает свой бонус %s " %
+                                                     (userid, name, paluchi0))
+
+                    cur.execute("DELETE FROM BONUS WHERE UserId = %i" % userid)
+                    conn.commit()
+                except Exception:
+                    pass
 
         else:
             await callback_query.answer("Не твоё")
