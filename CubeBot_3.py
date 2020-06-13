@@ -2242,13 +2242,8 @@ async def endgame(chatid):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
-    if str(chatid)[:4] == '-100':
-        await bot.send_animation(chatid, new_gifs[str(Numbers)])
-        await asyncio.sleep(3)
 
-        await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
-    else:
-        await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
+    await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
 
 
 #  choosing number of cube
