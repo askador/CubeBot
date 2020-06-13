@@ -1971,10 +1971,10 @@ async def achieves_bonus(bonnums, userid):
         cur.execute("SELECT Achieve from Achives WHERE UserId = %i AND Achieve = 'Адский покровитель🔥'" % userid)
         hell = cur.fetchall()
         if not hell:
-            mess.append(['Адский покровитель🔥', "666 666"])
+            mess.append(['Адский покровитель🔥', "6 666 666 666"])
             cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES(%i, 'Адский покровитель🔥')" % userid)
             conn.commit()
-            cur.execute("UPDATE USERS set Money = Money + 666666 WHERE UserId = %i" % userid)
+            cur.execute("UPDATE USERS set Money = Money + 6666666666 WHERE UserId = %i" % userid)
             conn.commit()
 
         cur.execute("SELECT Achieve from Achives WHERE UserId = %i AND Achieve = 'Везунчик'" % userid)
