@@ -485,8 +485,11 @@ async def shake_game(message):
                     await shake(name, userid, chatid, date)
                     shakeit.update([(chatid, False)])
                 else:
-                    await message.answer("Бросить можно через %s сек" %
+                    mmes = await message.answer("Бросить можно через %s сек" %
                                          str(delayed_start_dict[chatid] - int(message.date.timestamp())))
+                    cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
+                                (chatid, mmes.message_id))
+
             except Exception as e:
                 cur.execute("DELETE FROM GAME WHERE IDChat = %i" % chatid)
                 conn.commit()
@@ -1747,7 +1750,7 @@ async def autostart(chatid):
             conn.commit()
 
             date = int(time.time())
-            await algoritm(chatid, date)
+            #await algoritm(chatid, date)
             await endgame(chatid)
 
             cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
@@ -2038,7 +2041,7 @@ async def shake(name, userid, chatid, date):
     await asyncio.sleep(5)
 
     #   РАНДОМНОЕ ЧИСЛО
-    await algoritm(chatid, date)
+    #await algoritm(chatid, date)
 
     try:
         await bot.delete_message(chatid, mes1.message_id)
@@ -2077,8 +2080,22 @@ async def endgame(chatid):
 
     #  numbers
     namedb = 'logchat' + str(abs(chatid))
+    """
     cur.execute("SELECT Log From %s WHERE Id = (Select max(id) from %s)" % (namedb, namedb))
     Numbers = int(cur.fetchall()[0][0])
+    """
+
+    # sending dice emoji
+    dice_mes = await bot.send_dice(chatid)
+    Numbers = dice_mes.dice.value
+    cur.execute("INSERT INTO %s (Log) VALUES (%i)" % (namedb, Numbers))
+    conn.commit()
+    cur.execute("SELECT count(Id) FROM %s" % namedb)
+    kaunt = cur.fetchall()
+    if kaunt[0][0] > 9:
+        cur.execute("DELETE FROM %s WHERE Id <= (SELECT MAX(Id) FROM %s) - 10" % (namedb, namedb))
+        conn.commit()
+
 
     # processing all bets
     cur.execute("SELECT Id FROM BETS WHERE IDChat = %i AND Bet > 0" % chatid)
