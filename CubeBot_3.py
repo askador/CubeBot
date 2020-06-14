@@ -669,7 +669,7 @@ async def bonus(message):
 
             cur.execute("SELECT Money From USERS Where UserId = %i" % bonuserid)
             money = cur.fetchall()[0][0]
-            if money > 10000000:        # 10 000 000
+            if money > 1000000000:        # 1 000 000 000
                 lavebonus = int(random.randrange(15000, 25000))
             else:
                 lavebonus = int(random.randrange(1500, 2500))
