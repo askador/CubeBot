@@ -1,13 +1,13 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-import numpy as np
+from aiogram.dispatcher import filters
 from aiogram.dispatcher import Dispatcher
 import psycopg2
 import asyncio
 import random
 from datetime import datetime
 import time
-
+import numpy as np
 from aiogram.utils.exceptions import TelegramAPIError
 
 bot = Bot(token='996503468:AAE8aR09qP8uPdF-322GSr1DTtJUmUBAhmo', parse_mode='HTML')
@@ -2242,7 +2242,7 @@ async def endgame(chatid):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
-
+    await asyncio.sleep(3)
     await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
 
 
