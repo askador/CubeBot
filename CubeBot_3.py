@@ -35,7 +35,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start'])             #TODO
 async def start_message(message):
     userid = message.from_user.id
     chatid = message.chat.id
@@ -73,7 +73,7 @@ async def start_message(message):
                                                 "/advice [текст] - предложение для доработок")
 
 
-@dp.message_handler(commands=['rules'])
+@dp.message_handler(commands=['rules'])             #TODO
 async def rules_for_player(message):
     if message.from_user.id == message.chat.id:
         await message.answer("Угадай число от 1 до 6🎲\n\n"
@@ -90,7 +90,7 @@ async def rules_for_player(message):
         await message.reply("Используйте эту команду в личке с ботом")
 
 
-@dp.message_handler(commands=['help'])
+@dp.message_handler(commands=['help'])              #TODO
 async def help_for_player(message):
     if message.from_user.id == message.chat.id:
         await message.answer("<b>Игровые команды:</b>\n\n"
@@ -115,7 +115,7 @@ async def help_for_player(message):
         await message.reply("Используйте эту команду в личке с ботом")
 
 
-@dp.message_handler(regexp="!достижение ([0-9]+)")
+@dp.message_handler(regexp="!достижение ([0-9]+)")  #TODO
 async def achieve(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         userid = int(message.text.split()[1])
@@ -143,7 +143,7 @@ async def achieve(message):
             f"<b>{achieve}</b>")
 
 
-@dp.message_handler(regexp="!у достижение ([0-9]+)")
+@dp.message_handler(regexp="!у достижение ([0-9]+)")    #TODO
 async def achieve(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
 
@@ -163,7 +163,7 @@ async def achieve(message):
                 await message.answer("Проверьте правильность ID и названия достижения")
 
 
-@dp.message_handler(regexp="!скрыть стату")
+@dp.message_handler(regexp="!скрыть стату")             #TODO
 async def hide_stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         try:
@@ -198,7 +198,7 @@ async def hide_stats(message):
                 await bot.send_message(whoid, f"{name} получает достижение\n<b>Неуловимый</b>")
 
 
-@dp.message_handler(regexp="!открыть стату")
+@dp.message_handler(regexp="!открыть стату")            #TODO
 async def hide_stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         try:
@@ -218,7 +218,7 @@ async def hide_stats(message):
                 await message.reply("Стата %i открыта" % whoid)
 
 
-@dp.message_handler(lambda msg: msg.reply_to_message is not None and msg.text == "getid")
+@dp.message_handler(lambda msg: msg.reply_to_message is not None and msg.text == "getid")  #TODO
 async def s(message):
     try:
         await message.reply(message.reply_to_message.from_user.id)
@@ -226,7 +226,7 @@ async def s(message):
         pass
 
 
-@dp.message_handler(text='/statslog')
+@dp.message_handler(text='/statslog')               #TODO
 async def stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         if message.text == '/statslog':
@@ -290,7 +290,7 @@ async def stats(message):
                 await message.answer(stat)
 
 
-@dp.message_handler(regexp="/statslog сбросить")
+@dp.message_handler(regexp="/statslog сбросить")        #TODO
 async def stats_rollback(message):
     try:
         if message.text.split()[2] == "все":
@@ -312,7 +312,7 @@ async def stats_rollback(message):
         conn.commit()
 
 
-@dp.message_handler(commands=['setmoney'])
+@dp.message_handler(commands=['setmoney'])          #TODO
 async def setmoney(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         papaid = message.from_user.id
@@ -359,12 +359,12 @@ async def setmoney(message):
         await check_limit_money(int(towho))
 
 
-async def anti_spam_advice(message, *args, **kwargs):
+async def advice_anti_spam(message, *args, **kwargs):
     await message.reply("Не спамь")
 
 
 @dp.message_handler(commands=['advice'])
-@dp.throttled(anti_spam_advice, rate=10)
+@dp.throttled(advice_anti_spam, rate=10)
 async def advice(message):
     chatid = -443076596
     if message.chat.type == 'private':
@@ -476,7 +476,7 @@ async def shake_game(message):
         if Game is True and Shake is True and shakeit[chatid] is False:
 
             try:
-                if int(delayed_start_dict[chatid]) - int(message.date.timestamp()) < 0 or chatid == userid:
+                if int(delayed_start_dict[chatid]) - int(message.date.timestamp()) < 1 or chatid == userid:
                     cur.execute("DELETE FROM GAME WHERE IDChat = %i" % chatid)
                     conn.commit()
                     shakeit.update([(chatid, True)])
@@ -585,7 +585,7 @@ async def cancelbets(message):
                                 cur.execute("INSERT INTO todelmes (IDChat, MessId) VALUES('%i','%i')" %
                                             (chatid, cancel.message_id))
                             else:
-                                message.reply("Отменять нечего")
+                               await message.reply("Отменять нечего")
                         except Exception as e:
                             await message.reply("Oops. something went wrong. Try again.")
             except Exception:
@@ -756,7 +756,6 @@ async def drop_stats(message):
             cur.execute("UPDATE USERS set WON = 0, LOST = 0, Plays = 0 WHERE UserId = %i" % userid)
             await message.answer("Стата сброшена")
     except Exception as e:
-        conn.rollback()
         await message.reply("Oops. something went wrong. Try again.")
     else:
         conn.commit()
@@ -882,7 +881,7 @@ async def top(message):
 
             await message.answer(topchik)
         except Exception as e:
-            message.reply("Oops, something went wrong")
+            await message.reply("Oops, something went wrong")
 
 
 async def giveaway_timer(give_mes_id, userid, chatid):
@@ -962,10 +961,10 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             cur.execute(f"UPDATE USERS Set Money = Money + {how_many_proc} WHERE UserId = {userid}")
             await bot.send_message(chatid, "Раздача не состоялась, некому раздавать лавэ")
             cur.execute(f"DROP TABLE GIVEAWAY{abs(chatid)}")
-            conn.commit()
+            conn.commit()    #TODO
 
 
-@dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')
+@dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')   #TODO
 @dp.throttled(rate=1.3)
 async def scores(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
@@ -996,7 +995,7 @@ async def scores(callback_query: types.CallbackQuery):
         pass
 
 
-@dp.message_handler(regexp='!раздача ([0-9]+)')
+@dp.message_handler(regexp='!раздача ([0-9]+)')   #TODO
 async def giveaway(message):
     if message.text[:8] == '!раздача':
         userid = message.from_user.id
@@ -1008,12 +1007,11 @@ async def giveaway(message):
                 time_for_giveaway = int(cur.fetchall()[0][0])
 
                 if int(message.date.timestamp()) > time_for_giveaway or time_for_giveaway == 0:
-                    if int(message.text.split()[1]) <= 10 ** 10:
+                    if int(message.text.split()[1]) <= 300 ** 10:
                         name = str(message.from_user.full_name)
                         how_many = int(message.text.split()[1])
 
                         try:
-
                             cur.execute(f"CREATE TABLE GIVEAWAY{abs(chatid)}("
                                         "Id Serial,"
                                         "UserId              BIGINT,"
@@ -1022,7 +1020,6 @@ async def giveaway(message):
                                         "value                  INT,"
                                         "PRIMARY KEY(Id));")
                         except Exception as e:
-
                             await message.reply("Раздача лавэ уже начата")
                         else:
                             conn.commit()
@@ -1052,7 +1049,7 @@ async def giveaway(message):
                             await Loop.create_task(giveaway_timer(giveaway_mes.message_id, userid, chatid))
 
                     else:
-                        await message.reply("Раздать можно не больше 10 миллиардов")
+                        await message.reply("Раздать можно не больше 300 миллиардов")
                 else:
                     await message.reply("Устраивать раздачу можно раз в 1 час")
             else:
@@ -1556,9 +1553,10 @@ async def transfer_money(message):
                 await message.reply("Oops. something went wrong. Try again.")
             else:
                 conn.commit()
-
+        elif 10 ** 18 < int(''.join(message.text[2:].split(','))):
+            await message.reply("Передать можно не больше 1,000,000,000,000,000,000 за раз")
     except Exception:
-        pass
+        await message.reply("Не удалось передать деньги")
 
 
 # ПРОВЕРКА НА СТАВКУ
