@@ -265,7 +265,6 @@ async def stats(message):
                 for i in range(len(chats)):
                     cur.execute("SELECT Title FROM STATS WHERE IDChat = %i" % chats[i][0])
                     title = cur.fetchall()[0][0]
-                    print(title)
 
                     cur.execute("SELECT Plays FROM STATS WHERE IDChat = %i" % chats[i][0])
                     plays = cur.fetchall()[0][0]
