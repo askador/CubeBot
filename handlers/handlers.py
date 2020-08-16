@@ -257,8 +257,8 @@ async def stats(message):
                     Winfactor = round((int(Won) / int(Lost)), 3)
                 except Exception:
                     Winfactor = 0
-                stat += f"<b>Всего сыграно:</b> {AllPlays}\n" \
-                        f"<b>Коэффициент выигрыша:</b> {Winfactor}\n\n"
+                stat += "<b>Всего сыграно:</b> %s\n" \
+                        "<b>Коэффициент выигрыша:</b> %s\n\n" % (AllPlays, Winfactor)
 
                 cur.execute("SELECT IdChat FROM STATS WHERE IdChat is not Null AND Plays > 0")
                 chats = cur.fetchall()
@@ -282,7 +282,6 @@ async def stats(message):
                     cur.execute("SELECT Last_activity FROM STATS WHERE IDChat = %i" % chats[i][0])
                     last_activity = cur.fetchall()[0][0]
 
-
                     try:
                         avrg_bets_num = round((int(bets_num) / int(plays)), 3)
                     except Exception:
@@ -292,12 +291,14 @@ async def stats(message):
                     except Exception:
                         win_factor = 0
 
-                    stat += f"Chat Id: <b>{chats[i][0]}</b>\n" \
-                            f"Title: <b>{title}</b>\n" \
-                            f"Plays: <b>{plays}</b>\n" \
-                            f"Win Factor: <b>{win_factor}</b>\n" \
-                            f"Average bets number: <b>{avrg_bets_num}</b>\n" \
-                            f"Last activity: <b>{last_activity}</b>\n\n"
+                    stat += "Chat Id: <b>%s</b>\n" \
+                            "Title: <b>%s</b>\n" \
+                            "Plays: <b>%s</b>\n" \
+                            "Win Factor: <b>%s</b>\n" \
+                            "Average bets number: <b>%s</b>\n" \
+                            "Last activity: <b>%s</b>\n\n" % (
+                        chats[i][0], title, plays, win_factor, avrg_bets_num, last_activity
+                    )
                 await bot.send_message(message.chat.id, stat)
 
 
