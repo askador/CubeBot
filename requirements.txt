@@ -1,4 +1,4 @@
-aiogram==2.8
+aiogram==2.9.2
 attrs==19.3.0
 config==0.5.0.post0
 multidict==4.7.5

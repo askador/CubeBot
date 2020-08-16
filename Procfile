@@ -1,1 +1,1 @@
-worker: python3 CubeBot_3.py
+worker: python3.8 bot.py
