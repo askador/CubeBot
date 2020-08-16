@@ -83,8 +83,8 @@ class Bets:
                     "AND Numbers = '%s'" % (bet, self.userid, self.chatid, num))
                 conn.commit()
             else:
-                cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat) "
-                            "VALUES ('%i', '%i', '%s', '%i')" % (self.userid, bet, num, self.chatid))
+                cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat, Showed) "
+                            "VALUES ('%i', '%i', '%s', '%i', False)" % (self.userid, bet, num, self.chatid))
 
                 cur.execute(
                     "UPDATE USERS SET FullName = '%s', UserName = '%s' , Money = Money - '%i'"
@@ -130,7 +130,7 @@ class Bets:
                         PrevBets += str(await makegoodview(Bet)) + ' ' + 'на' + ' ' + str(Num) + '\n'
                         b.append(Num)
                         cur.execute("INSERT INTO BETS (UserId, Bet, Numbers, IDChat, Showed) "
-                                    "VALUES ('%i', '%i', '%s', '%i', True)" % (self.userid, Bet, Num, self.chatid))
+                                    "VALUES ('%i', '%i', '%s', '%i', False)" % (self.userid, Bet, Num, self.chatid))
 
                         cur.execute(
                             "UPDATE USERS SET FullName = '%s', UserName = '%s' , Money = Money - '%i'"
