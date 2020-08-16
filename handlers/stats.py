@@ -8,5 +8,9 @@ class Stats:
     def udapte_chat_stats(self):
         pass
 
+    def new_member(self):
+        pass
+
     def show_stats(self):
         pass
+

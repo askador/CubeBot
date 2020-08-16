@@ -251,7 +251,7 @@ async def stats(message):
                 cur.execute("SELECT Lost FROM STATS WHERE Title = 'General'")
                 Lost = cur.fetchall()[0][0]
             except Exception as e:
-                pass
+                await message.answer(f"Something went wrong\n{e}")
             else:
                 try:
                     Winfactor = round((int(Won) / int(Lost)), 3)
