@@ -135,22 +135,29 @@ async def achieve(message):
         achieve = str(' '.join(message.text.split()[2:]))
 
         try:
-            cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES (%i, '%s')" % (userid, achieve))
+            cur.execute("SELECT Achieve from Achives WHERE UserId = %i AND Achieve = '%s'" % (userid, achieve))
+            already_exists = cur.fetchall()
+            if not already_exists:
+                cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES (%i, '%s')" % (userid, achieve))
+
+                await message.answer(f"Achievement {achieve} was added to {userid}")
+                cur.execute("SELECT FullName FROM Users WHERE UserID = %i" % userid)
+                name = cur.fetchall()[0][0]
+
+                await bot.send_message(userid, "🌟Сириус стал ярче🌟")
+                await asyncio.sleep(2)
+                await bot.send_message(userid, "🦜Кукушка услышала пение🦜")
+                await asyncio.sleep(2)
+                await bot.send_message(userid, f"{name} получает достижение\n"
+                                               f"<b>{achieve}</b>")
+
+            else:
+                await message.answer(f"Achievement {achieve} is already added to {userid}")
         except Exception as e:
             await message.reply("Не удалось добавить")
             conn.rollback()
         else:
             conn.commit()
-            await message.answer(f"Achievement {achieve} was added to {userid}")
-            cur.execute("SELECT FullName FROM Users WHERE UserID = %i" % userid)
-            name = cur.fetchall()[0][0]
-
-            await bot.send_message(userid, "🌟Сириус стал ярче🌟")
-            await asyncio.sleep(2)
-            await bot.send_message(userid, "🦜Кукушка услышала пение🦜")
-            await asyncio.sleep(2)
-            await bot.send_message(userid, f"{name} получает достижение\n"
-                                           f"<b>{achieve}</b>")
 
 
 @dp.message_handler(regexp="!у достижение ([0-9]+)")
@@ -220,57 +227,6 @@ async def setmoney(message):
             conn.rollback()
         else:
             conn.commit()
-
-
-@dp.message_handler(regexp="!скрыть стату")
-async def hide_stats(message):
-    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
-        try:
-            whoid = int(message.text.split()[2])
-        except Exception:
-            await message.reply("Not correct input\n!скрыть стату ID")
-        else:
-            try:
-                cur.execute("UPDATE Users set Show_stat = False WHERE UserId = %i" % whoid)
-            except Exception as e:
-                await message.reply("Not correct Id")
-                conn.rollback()
-            else:
-                conn.commit()
-                #  Achevement Неуловимый
-                await message.reply("Стата %i скрыта" % whoid)
-
-                cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES (%i, 'Неуловимый')" % whoid)
-
-                conn.commit()
-                await message.answer(f"Achievement Неуловимый was added to {whoid}")
-                cur.execute("SELECT FullName FROM Users WHERE UserID = %i" % whoid)
-                name = cur.fetchall()[0][0]
-
-                await bot.send_message(whoid, "🌟Сириус стал ярче🌟")
-                await asyncio.sleep(2)
-                await bot.send_message(whoid, "🦜Кукушка услышала пение🦜")
-                await asyncio.sleep(2)
-                await bot.send_message(whoid, f"{name} получает достижение\n<b>Неуловимый</b>")
-
-
-@dp.message_handler(regexp="!открыть стату")
-async def hide_stats(message):
-    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
-        try:
-            whoid = int(message.text.split()[2])
-        except Exception:
-            await message.reply("Not correct input\n!открыть стату ID")
-        else:
-            try:
-
-                cur.execute("UPDATE Users set Show_stat = True WHERE UserId = %i" % whoid)
-            except Exception as e:
-                await message.reply("Not correct Id")
-                conn.rollback()
-            else:
-                conn.commit()
-                await message.reply("Стата %i открыта" % whoid)
 
 
 @dp.message_handler(lambda msg: msg.reply_to_message is not None and msg.text == "getid")
@@ -646,6 +602,60 @@ async def drop_stats(message):
         await message.reply("Oops. something went wrong. Try again.")
     else:
         conn.commit()
+
+
+@dp.message_handler(regexp="!стата скрыть")
+async def hide_stats(message):
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        try:
+            whoid = int(message.text.split()[2])
+        except Exception:
+            await message.reply("Not correct input\n!скрыть стату ID")
+        else:
+            try:
+                cur.execute("SELECT Achieve from Achives WHERE UserId = %i AND Achieve = 'Неуловимый'" % whoid)
+                already_exists = cur.fetchall()
+                if not already_exists:
+                    cur.execute("UPDATE Users set Show_stat = False WHERE UserId = %i" % whoid)
+                    #  Achievement Неуловимый
+                    await message.reply("Стата %i скрыта" % whoid)
+
+                    cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES (%i, 'Неуловимый')" % whoid)
+
+                    await message.answer(f"Achievement Неуловимый was added to {whoid}")
+                    cur.execute("SELECT FullName FROM Users WHERE UserID = %i" % whoid)
+                    name = cur.fetchall()[0][0]
+
+                    await bot.send_message(whoid, "🌟Сириус стал ярче🌟")
+                    await asyncio.sleep(2)
+                    await bot.send_message(whoid, "🦜Кукушка услышала пение🦜")
+                    await asyncio.sleep(2)
+                    await bot.send_message(whoid, f"{name} получает достижение\n<b>Неуловимый</b>")
+                else:
+                    await message.answer(f"{whoid}'s stat is already hidden")
+            except Exception as e:
+                await message.reply("Not correct Id")
+                conn.rollback()
+            else:
+                conn.commit()
+
+
+@dp.message_handler(regexp="!стата открыть")
+async def hide_stats(message):
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        try:
+            whoid = int(message.text.split()[2])
+        except Exception:
+            await message.reply("Not correct input\n!открыть стату ID")
+        else:
+            try:
+                cur.execute("UPDATE Users set Show_stat = True WHERE UserId = %i" % whoid)
+            except Exception as e:
+                await message.reply("Not correct Id")
+                conn.rollback()
+            else:
+                conn.commit()
+                await message.reply("Стата %i открыта" % whoid)
 
 
 @dp.message_handler(regexp="!стата сбросить ([0-9]+)")
