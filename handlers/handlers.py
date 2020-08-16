@@ -297,7 +297,6 @@ async def stats(message):
                         "Last activity: <b>%s</b>\n\n" % (
                     chats[i][0], title, plays, win_factor, avrg_bets_num, last_activity
                     )
-            print(stat)
             await bot.send_message(526497876, stat)
 
 
