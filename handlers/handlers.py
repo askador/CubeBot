@@ -237,68 +237,67 @@ async def s(message):
         pass
 
 
-@dp.message_handler(text='/statslog')
+@dp.message_handler(text='/1statslog')
 async def stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
-        if message.text == '/statslog':
-            stat = ''
+        stat = ''
 
+        try:
+            cur.execute("SELECT Plays FROM STATS WHERE Title = 'General'")
+            AllPlays = cur.fetchall()[0][0]
+            cur.execute("SELECT Won FROM STATS WHERE Title = 'General'")
+            Won = cur.fetchall()[0][0]
+            cur.execute("SELECT Lost FROM STATS WHERE Title = 'General'")
+            Lost = cur.fetchall()[0][0]
+        except Exception as e:
+            await message.answer(f"Something went wrong\n{e}")
+        else:
             try:
-                cur.execute("SELECT Plays FROM STATS WHERE Title = 'General'")
-                AllPlays = cur.fetchall()[0][0]
-                cur.execute("SELECT Won FROM STATS WHERE Title = 'General'")
+                Winfactor = round((int(Won) / int(Lost)), 3)
+            except Exception:
+                Winfactor = 0
+            stat += "<b>Всего сыграно:</b> %s\n" \
+                    "<b>Коэффициент выигрыша:</b> %s\n\n" % (AllPlays, Winfactor)
+
+            cur.execute("SELECT IdChat FROM STATS WHERE IdChat is not Null AND Plays > 0")
+            chats = cur.fetchall()
+            for i in range(len(chats)):
+                cur.execute("SELECT Title FROM STATS WHERE IDChat = %i" % chats[i][0])
+                title = cur.fetchall()[0][0]
+
+                cur.execute("SELECT Plays FROM STATS WHERE IDChat = %i" % chats[i][0])
+                plays = cur.fetchall()[0][0]
+
+                cur.execute("SELECT Won FROM STATS WHERE IDChat = %i" % chats[i][0])
                 Won = cur.fetchall()[0][0]
-                cur.execute("SELECT Lost FROM STATS WHERE Title = 'General'")
+
+                cur.execute("SELECT Lost FROM STATS WHERE IDChat = %i" % chats[i][0])
                 Lost = cur.fetchall()[0][0]
-            except Exception as e:
-                await message.answer(f"Something went wrong\n{e}")
-            else:
+
+                cur.execute("SELECT bets_num FROM STATS WHERE IDChat = %i" % chats[i][0])
+                bets_num = cur.fetchall()[0][0]
+
+                cur.execute("SELECT Last_activity FROM STATS WHERE IDChat = %i" % chats[i][0])
+                last_activity = cur.fetchall()[0][0]
+
                 try:
-                    Winfactor = round((int(Won) / int(Lost)), 3)
+                    avrg_bets_num = round((int(bets_num) / int(plays)), 3)
                 except Exception:
-                    Winfactor = 0
-                stat += "<b>Всего сыграно:</b> %s\n" \
-                        "<b>Коэффициент выигрыша:</b> %s\n\n" % (AllPlays, Winfactor)
+                    avrg_bets_num = 0
+                try:
+                    win_factor = round((int(Won) / int(Lost)), 3)
+                except Exception:
+                    win_factor = 0
 
-                cur.execute("SELECT IdChat FROM STATS WHERE IdChat is not Null AND Plays > 0")
-                chats = cur.fetchall()
-                for i in range(len(chats)):
-                    cur.execute("SELECT Title FROM STATS WHERE IDChat = %i" % chats[i][0])
-                    title = cur.fetchall()[0][0]
-
-                    cur.execute("SELECT Plays FROM STATS WHERE IDChat = %i" % chats[i][0])
-                    plays = cur.fetchall()[0][0]
-
-                    cur.execute("SELECT Won FROM STATS WHERE IDChat = %i" % chats[i][0])
-                    Won = cur.fetchall()[0][0]
-
-                    cur.execute("SELECT Lost FROM STATS WHERE IDChat = %i" % chats[i][0])
-                    Lost = cur.fetchall()[0][0]
-
-                    cur.execute("SELECT bets_num FROM STATS WHERE IDChat = %i" % chats[i][0])
-                    bets_num = cur.fetchall()[0][0]
-
-                    cur.execute("SELECT Last_activity FROM STATS WHERE IDChat = %i" % chats[i][0])
-                    last_activity = cur.fetchall()[0][0]
-
-                    try:
-                        avrg_bets_num = round((int(bets_num) / int(plays)), 3)
-                    except Exception:
-                        avrg_bets_num = 0
-                    try:
-                        win_factor = round((int(Won) / int(Lost)), 3)
-                    except Exception:
-                        win_factor = 0
-
-                    stat += "Chat Id: <b>%s</b>\n" \
-                            "Title: <b>%s</b>\n" \
-                            "Plays: <b>%s</b>\n" \
-                            "Win Factor: <b>%s</b>\n" \
-                            "Average bets number: <b>%s</b>\n" \
-                            "Last activity: <b>%s</b>\n\n" % (
-                        chats[i][0], title, plays, win_factor, avrg_bets_num, last_activity
-                    )
-                await bot.send_message(message.chat.id, stat)
+                stat += "Chat Id: <b>%s</b>\n" \
+                        "Title: <b>%s</b>\n" \
+                        "Plays: <b>%s</b>\n" \
+                        "Win Factor: <b>%s</b>\n" \
+                        "Average bets number: <b>%s</b>\n" \
+                        "Last activity: <b>%s</b>\n\n" % (
+                    chats[i][0], title, plays, win_factor, avrg_bets_num, last_activity
+                )
+            await bot.send_message(message.chat.id, stat)
 
 
 @dp.message_handler(regexp="/statslog сбросить")
