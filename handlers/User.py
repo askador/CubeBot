@@ -27,7 +27,7 @@ class User:
                 cur.execute(
                     "DELETE FROM USERS WHERE Id = (SELECT MAX(ID) FROM USERS WHERE USERID = '%i')" % self.userid)
         except Exception as e:
-
+            pass
         else:
             conn.commit()
 
@@ -40,7 +40,7 @@ class User:
                 if UserdIds < 1:
                     cur.execute("INSERT INTO chatusers (IDChat, UserId) VALUES (%i, %i)" % (self.chatid, self.userid))
         except Exception as e:
-
+            pass
         else:
             conn.commit()
 

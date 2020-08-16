@@ -55,7 +55,7 @@ async def bonus_autostart(name, userid, chatid):
                 cur.execute("DELETE FROM BONUS WHERE UserId = %i" % userid)
                 conn.commit()
             except Exception as e:
-
+                pass
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (lave[0][0], userid))
             conn.commit()
 
