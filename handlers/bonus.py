@@ -133,7 +133,7 @@ class Bonus:
             bonustime = int(cur.fetchall()[0][0])
         except Exception as e:
             await message.reply("Oops, something went wrong")
-            print(e)
+            pass
         else:
             ostalos = bonustime - int(message.date.timestamp())
 
@@ -186,7 +186,7 @@ class Bonus:
             cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % self.userid)
             user_mes = cur.fetchall()[0][0]
         except Exception as e:
-            print(e)
+            pass
         else:
             if user_mes == mes_id:
                 try:
@@ -208,7 +208,7 @@ class Bonus:
                                                     reply_markup=keybonus)
                         await bot.answer_callback_query(call.id)
                     except Exception as e:
-                        print(e)
+                        pass
             else:
                 await call.answer("Не твоё")
 
@@ -221,7 +221,7 @@ class Bonus:
             cur.execute("SELECT Bonus_mes_id FROM USERS WHERE USERID = %i" % self.userid)
             bonususermes = cur.fetchall()[0][0]
         except Exception as e:
-            print(e)
+            pass
         else:
             if bonususermes == mes_id:
                 try:
@@ -250,7 +250,7 @@ class Bonus:
                                                     reply_markup=keybonus1)
                         await bot.answer_callback_query(call.id)
                     except Exception as e:
-                        print(e)
+                        pass
 
             else:
                 await call.answer("Не твоё")

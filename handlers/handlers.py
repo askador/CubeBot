@@ -828,26 +828,28 @@ async def giveaway(message):
     if message.text[:8] == '!раздача':
         userid = message.from_user.id
         chatid = message.chat.id
-        # if userid != chatid:                      #TODO
-        try:
-            cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
-            time_for_giveaway = int(cur.fetchall()[0][0])
-        except Exception as e:
-            print(e)
-        else:
-            if int(message.date.timestamp()) > time_for_giveaway or time_for_giveaway == 0:
-                if 100000 <= int(message.text.split()[1]) <= 500 * 10**9:
-                    created = await create_db(chatid)
-                    if created == 0:
-                        pass
-                    else:
-                        await start_giveaway(message)
-
-                else:
-                    await message.reply("Минимальная сумма для раздачи 100 000\n"
-                                        "Максимальная - 500 миллиардов")
+        if userid != chatid:                      #TODO
+            try:
+                cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
+                time_for_giveaway = int(cur.fetchall()[0][0])
+            except Exception as e:
+                print(e)
             else:
-                await message.reply("Устраивать раздачу можно раз в 1 час")
+                if int(message.date.timestamp()) > time_for_giveaway or time_for_giveaway == 0:
+                    if 100000 <= int(message.text.split()[1]) <= 500 * 10**9:
+                        created = await create_db(chatid)
+                        if created == 0:
+                            pass
+                        else:
+                            await start_giveaway(message)
+
+                    else:
+                        await message.reply("Минимальная сумма для раздачи 100 000\n"
+                                            "Максимальная - 500 миллиардов")
+                else:
+                    await message.reply("Устраивать раздачу можно раз в 1 час")
+        else:
+            await message.answer("Устраивайте раздачу в группах!")
 
 
 @dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')

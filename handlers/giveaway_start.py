@@ -45,13 +45,13 @@ async def start_giveaway(message):
     button = types.InlineKeyboardButton(text='+ 1🏅', callback_data="раздача")
     giveaway_bt.add(button)
 
-    timer = .5 * 60
+    timer = 2.5 * 60
 
     cur.execute(f"INSERT INTO GIVEAWAY{abs(chatid)} (UserId, How_many, FullName, Time)"
                 f" Values ('{userid}', '{how_much}', '%s', %i)" % (fullname, timer))
     conn.commit()
 
-    cur.execute(f"UPDATE USERS SET Giveaway_time = '{int(date) + 0}', "
+    cur.execute(f"UPDATE USERS SET Giveaway_time = '{int(date) + 3598}', "
                 f"Money = Money - {how_much} "
                 f"WHERE UserId = {userid}")
     conn.commit()
