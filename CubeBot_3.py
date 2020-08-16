@@ -35,7 +35,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 
-@dp.message_handler(commands=['start'])             #TODO
+@dp.message_handler(commands=['start'])
 async def start_message(message):
     userid = message.from_user.id
     chatid = message.chat.id
@@ -73,7 +73,7 @@ async def start_message(message):
                                                 "/advice [текст] - предложение для доработок")
 
 
-@dp.message_handler(commands=['rules'])             #TODO
+@dp.message_handler(commands=['rules'])
 async def rules_for_player(message):
     if message.from_user.id == message.chat.id:
         await message.answer("Угадай число от 1 до 6🎲\n\n"
@@ -90,7 +90,7 @@ async def rules_for_player(message):
         await message.reply("Используйте эту команду в личке с ботом")
 
 
-@dp.message_handler(commands=['help'])              #TODO
+@dp.message_handler(commands=['help'])
 async def help_for_player(message):
     if message.from_user.id == message.chat.id:
         await message.answer("<b>Игровые команды:</b>\n\n"
@@ -115,7 +115,7 @@ async def help_for_player(message):
         await message.reply("Используйте эту команду в личке с ботом")
 
 
-@dp.message_handler(regexp="!достижение ([0-9]+)")  #TODO
+@dp.message_handler(regexp="!достижение ([0-9]+)")
 async def achieve(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         userid = int(message.text.split()[1])
@@ -143,7 +143,7 @@ async def achieve(message):
             f"<b>{achieve}</b>")
 
 
-@dp.message_handler(regexp="!у достижение ([0-9]+)")    #TODO
+@dp.message_handler(regexp="!у достижение ([0-9]+)")
 async def achieve(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
 
@@ -163,7 +163,7 @@ async def achieve(message):
                 await message.answer("Проверьте правильность ID и названия достижения")
 
 
-@dp.message_handler(regexp="!скрыть стату")             #TODO
+@dp.message_handler(regexp="!скрыть стату")
 async def hide_stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         try:
@@ -198,7 +198,7 @@ async def hide_stats(message):
                 await bot.send_message(whoid, f"{name} получает достижение\n<b>Неуловимый</b>")
 
 
-@dp.message_handler(regexp="!открыть стату")            #TODO
+@dp.message_handler(regexp="!открыть стату")
 async def hide_stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         try:
@@ -218,7 +218,7 @@ async def hide_stats(message):
                 await message.reply("Стата %i открыта" % whoid)
 
 
-@dp.message_handler(lambda msg: msg.reply_to_message is not None and msg.text == "getid")  #TODO
+@dp.message_handler(lambda msg: msg.reply_to_message is not None and msg.text == "getid")
 async def s(message):
     try:
         await message.reply(message.reply_to_message.from_user.id)
@@ -226,7 +226,7 @@ async def s(message):
         pass
 
 
-@dp.message_handler(text='/statslog')               #TODO
+@dp.message_handler(text='/statslog')
 async def stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         if message.text == '/statslog':
@@ -290,7 +290,7 @@ async def stats(message):
                 await message.answer(stat)
 
 
-@dp.message_handler(regexp="/statslog сбросить")        #TODO
+@dp.message_handler(regexp="/statslog сбросить")
 async def stats_rollback(message):
     try:
         if message.text.split()[2] == "все":
@@ -312,7 +312,7 @@ async def stats_rollback(message):
         conn.commit()
 
 
-@dp.message_handler(commands=['setmoney'])          #TODO
+@dp.message_handler(commands=['setmoney'])
 async def setmoney(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         papaid = message.from_user.id
@@ -964,7 +964,7 @@ async def giveaway_timer(give_mes_id, userid, chatid):
             conn.commit()    #TODO
 
 
-@dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')   #TODO
+@dp.callback_query_handler(lambda call_bonus: call_bonus.data == 'раздача')
 @dp.throttled(rate=1.3)
 async def scores(callback_query: types.CallbackQuery):
     chatid = callback_query.message.chat.id
@@ -995,7 +995,7 @@ async def scores(callback_query: types.CallbackQuery):
         pass
 
 
-@dp.message_handler(regexp='!раздача ([0-9]+)')   #TODO
+@dp.message_handler(regexp='!раздача ([0-9]+)')
 async def giveaway(message):
     if message.text[:8] == '!раздача':
         userid = message.from_user.id
