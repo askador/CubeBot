@@ -138,6 +138,16 @@ async def achieves_plays(userid):
             conn.commit()
             cur.execute("UPDATE USERS set Money = Money + 1000000000000 WHERE UserId = %i" % userid)
             conn.commit()
+    if plays >= 5000:
+        "Вне досегаемости"
+        cur.execute("SELECT Achieve from Achives WHERE UserId = %i AND Achieve = 'Вне досегаемости'" % userid)
+        fivethousand = cur.fetchall()
+        if not fivethousand:
+            mess.append(['Вне досегаемости', "1 000 000 000 000 000"])
+            cur.execute("INSERT INTO Achives (UserId, Achieve) VALUES(%i, 'Вне досегаемости')" % userid)
+            conn.commit()
+            cur.execute("UPDATE USERS set Money = Money + 1000000000000000 WHERE UserId = %i" % userid)
+            conn.commit()
     return mess
 
 

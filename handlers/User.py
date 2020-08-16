@@ -27,7 +27,7 @@ class User:
                 cur.execute(
                     "DELETE FROM USERS WHERE Id = (SELECT MAX(ID) FROM USERS WHERE USERID = '%i')" % self.userid)
         except Exception as e:
-            print(e)
+
         else:
             conn.commit()
 
@@ -40,7 +40,7 @@ class User:
                 if UserdIds < 1:
                     cur.execute("INSERT INTO chatusers (IDChat, UserId) VALUES (%i, %i)" % (self.chatid, self.userid))
         except Exception as e:
-            print(e)
+
         else:
             conn.commit()
 
@@ -110,7 +110,7 @@ class User:
                 await to_del_mess(self.chatid, us_bets.message_id)
         except Exception as e:
             await msg.reply("Oops. something went wrong. Try again.")
-            print(e)
+
 
     async def cancel_bets(self, msg):
         cur.execute("SELECT count(Bet) FROM BETS WHERE UserId = %i AND IDChat = %i" % (self.userid, self.chatid))

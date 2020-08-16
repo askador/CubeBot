@@ -51,7 +51,7 @@ class Game:
             cur.execute("SELECT Shake FROM Game WHERE IDChat = %i" % self.chatid)
             is_game = cur.fetchall()
         except Exception as e:
-            print(e)
+
         else:
             if is_game:
                 mes3 = await message.reply("Игра уже запущена")

@@ -393,7 +393,6 @@ async def shake_game(message):
 
             except Exception as e:
                 conn.rollback()
-                print(e)
 
         if Shake is False and shaking is False:
             mes = await message.reply("Сначала сделай ставку")
@@ -410,7 +409,6 @@ async def chekbet(message: types.Message):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        print(e)
         await message.reply("Oops, something went wrong")
     else:
         if Shaking:
@@ -436,7 +434,6 @@ async def process_callback_game_buttons(callback_query: types.CallbackQuery):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        print(e)
         await bot.send_message(chatid, "Oops, something went wrong")
     else:
         if Shaking:
@@ -460,7 +457,7 @@ async def repeat_bet(message):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        print(e)
+        
         await message.reply("Oops, something went wrong")
     else:
         if Shaking:
@@ -482,7 +479,7 @@ async def double_bet(message):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        print(e)
+        
         await message.reply("Oops, something went wrong")
     else:
         if Shaking:
@@ -503,7 +500,7 @@ async def user_bets(message):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        print(e)
+        
         await message.reply("Oops, something went wrong")
     else:
         if Shaking:
@@ -524,7 +521,7 @@ async def cancelbets(message):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        print(e)
+        
         await message.reply("Oops, something went wrong")
     else:
         if Shaking:
@@ -703,7 +700,7 @@ async def top(message):
             await message.answer(topchik)
         except Exception as e:
             await message.reply("Oops, something went wrong")
-            print(e)
+            
 
 
 @dp.message_handler(text='!рейтинг 10')
@@ -737,7 +734,7 @@ async def top_10(message):
 
             await message.answer(topchik)
         except Exception as e:
-            print(e)
+            
             await message.reply("Oops, something went wrong")
 
 
@@ -843,7 +840,7 @@ async def giveaway(message):
                 cur.execute(f"SELECT Giveaway_time FROM Users WHERE UserId = {userid}")
                 time_for_giveaway = int(cur.fetchall()[0][0])
             except Exception as e:
-                print(e)
+                pass
             else:
                 if int(message.date.timestamp()) > time_for_giveaway or time_for_giveaway == 0:
                     if 100000 <= int(message.text.split()[1]) <= 500 * 10**9:
@@ -893,5 +890,5 @@ async def scores(callback_query: types.CallbackQuery):
 
 @dp.errors_handler(exception=TelegramAPIError)
 async def error_handler(update, e):
-    print(e)
+    
     return True

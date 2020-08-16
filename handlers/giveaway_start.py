@@ -27,7 +27,7 @@ async def create_db(chatid):
             else:
                 return 0
         except Exception as e:
-            print(e)
+
             return 0
     else:
         conn.commit()

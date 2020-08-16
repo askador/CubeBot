@@ -18,7 +18,7 @@ class Chat:
                         "Log     VARCHAR(20)  NOT NULL,"
                         "PRIMARY KEY(Id));" % namedb)
         except Exception as e:
-            print(e)
+
         else:
             conn.commit()
 
@@ -32,7 +32,7 @@ class Chat:
                 cur.execute("UPDATE Stats set Title = '%s', Last_activity = '%s' WHERE IdChat = '%i'" %
                             (self.title, self.date, self.chatid))
         except Exception as e:
-            print(e)
+
         else:
             conn.commit()
 
