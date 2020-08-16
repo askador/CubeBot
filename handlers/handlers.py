@@ -296,8 +296,9 @@ async def stats(message):
                         "Average bets number: <b>%s</b>\n" \
                         "Last activity: <b>%s</b>\n\n" % (
                     chats[i][0], title, plays, win_factor, avrg_bets_num, last_activity
-                )
-            await bot.send_message(message.chat.id, stat)
+                    )
+            print(stat)
+            await bot.send_message(526497876, stat)
 
 
 @dp.message_handler(regexp="/statslog сбросить")
