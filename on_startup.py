@@ -34,7 +34,7 @@ async def loop_bonus_close():
             loop_bonus = asyncio.get_event_loop()
             loop_bonus.create_task(bonus_autostart(name, userid, chatid))
         except Exception as e:
-
+            pass
 
 
 async def loop_game_autostart():
