@@ -241,7 +241,6 @@ async def s(message):
 async def stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
         if message.text == '/statslog':
-            print("Ok")
             stat = ''
 
             try:
@@ -298,8 +297,7 @@ async def stats(message):
                             f"Win Factor: <b>{win_factor}</b>\n" \
                             f"Average bets number: <b>{avrg_bets_num}</b>\n" \
                             f"Last activity: <b>{last_activity}</b>\n\n"
-                print("Ok2")
-                await message.answer(stat)
+                await bot.send_message(message.chat.id, stat)
 
 
 @dp.message_handler(regexp="/statslog сбросить")
