@@ -259,43 +259,43 @@ async def stats(message):
             stat += f"<b>Всего сыграно:</b> {AllPlays}\n" \
                     f"<b>Коэффициент выигрыша:</b> {Winfactor}\n\n"
 
-            cur.execute("SELECT IdChat FROM STATS WHERE IdChat is not Null AND Plays > 0")
-            chats = cur.fetchall()
-            for i in range(len(chats)):
-                cur.execute("SELECT Title FROM STATS WHERE IDChat = %i" % chats[i][0])
-                title = cur.fetchall()[0][0]
-
-                cur.execute("SELECT Plays FROM STATS WHERE IDChat = %i" % chats[i][0])
-                plays = cur.fetchall()[0][0]
-
-                cur.execute("SELECT Won FROM STATS WHERE IDChat = %i" % chats[i][0])
-                Won = cur.fetchall()[0][0]
-
-                cur.execute("SELECT Lost FROM STATS WHERE IDChat = %i" % chats[i][0])
-                Lost = cur.fetchall()[0][0]
-
-                cur.execute("SELECT bets_num FROM STATS WHERE IDChat = %i" % chats[i][0])
-                bets_num = cur.fetchall()[0][0]
-
-                cur.execute("SELECT Last_activity FROM STATS WHERE IDChat = %i" % chats[i][0])
-                last_activity = cur.fetchall()[0][0]
-
-
-                try:
-                    avrg_bets_num = round((int(bets_num) / int(plays)), 3)
-                except Exception:
-                    avrg_bets_num = 0
-                try:
-                    win_factor = round((int(Won) / int(Lost)), 3)
-                except Exception:
-                    win_factor = 0
-
-                stat += f"Chat Id: <b>{chats[i][0]}</b>\n" \
-                        f"Title: <b>{title}</b>\n" \
-                        f"Plays: <b>{plays}</b>\n" \
-                        f"Win Factor: <b>{win_factor}</b>\n" \
-                        f"Average bets number: <b>{avrg_bets_num}</b>\n" \
-                        f"Last activity: <b>{last_activity}</b>\n\n"
+            # cur.execute("SELECT IdChat FROM STATS WHERE IdChat is not Null AND Plays > 0")
+            # chats = cur.fetchall()
+            # for i in range(len(chats)):
+            #     cur.execute("SELECT Title FROM STATS WHERE IDChat = %i" % chats[i][0])
+            #     title = cur.fetchall()[0][0]
+            #
+            #     cur.execute("SELECT Plays FROM STATS WHERE IDChat = %i" % chats[i][0])
+            #     plays = cur.fetchall()[0][0]
+            #
+            #     cur.execute("SELECT Won FROM STATS WHERE IDChat = %i" % chats[i][0])
+            #     Won = cur.fetchall()[0][0]
+            #
+            #     cur.execute("SELECT Lost FROM STATS WHERE IDChat = %i" % chats[i][0])
+            #     Lost = cur.fetchall()[0][0]
+            #
+            #     cur.execute("SELECT bets_num FROM STATS WHERE IDChat = %i" % chats[i][0])
+            #     bets_num = cur.fetchall()[0][0]
+            #
+            #     cur.execute("SELECT Last_activity FROM STATS WHERE IDChat = %i" % chats[i][0])
+            #     last_activity = cur.fetchall()[0][0]
+            #
+            #
+            #     try:
+            #         avrg_bets_num = round((int(bets_num) / int(plays)), 3)
+            #     except Exception:
+            #         avrg_bets_num = 0
+            #     try:
+            #         win_factor = round((int(Won) / int(Lost)), 3)
+            #     except Exception:
+            #         win_factor = 0
+            #
+            #     stat += f"Chat Id: <b>{chats[i][0]}</b>\n" \
+            #             f"Title: <b>{title}</b>\n" \
+            #             f"Plays: <b>{plays}</b>\n" \
+            #             f"Win Factor: <b>{win_factor}</b>\n" \
+            #             f"Average bets number: <b>{avrg_bets_num}</b>\n" \
+            #             f"Last activity: <b>{last_activity}</b>\n\n"
             await bot.send_message(message.chat.id, stat)
 
 
@@ -699,7 +699,6 @@ async def top(message):
         except Exception as e:
             await message.reply("Oops, something went wrong")
             
-
 
 @dp.message_handler(text='!рейтинг 10')
 async def top_10(message):
