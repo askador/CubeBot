@@ -765,7 +765,7 @@ async def transfer_money(message):
                             await bot.send_message(chatid,
                                                    "<a href='tg://user?id=%i'>%s</a> передал "
                                                    "<a href='tg://user?id=%i'>%s</a> "
-                                                   "%s грывень" % (userid, name, whoid, whoname, makegoodview(howmuch)))
+                                                   "%s грывень" % (userid, name, whoid, whoname, await makegoodview(howmuch)))
 
                         else:
                             await bot.send_message(chatid, "Нету столько", reply_to_message_id=message.message_id)
