@@ -37,7 +37,6 @@ class Chat:
         else:
             conn.commit()
 
-
     async def logs(self, message):
         LOG = ''
         namedb = 'logchat' + str(abs(self.chatid))

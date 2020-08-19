@@ -129,7 +129,7 @@ async def endgame(chatid):
             # UPDATE STATSLOG
             cur.execute("UPDATE STATS set Plays = Plays + 1, Won = Won + %i, Lost = Lost + %i, Bets_num = Bets_num + %i"
                         "WHERE IdChat = %i" % (ALLwins, Lose, Bets_num, chatid))
-            cur.execute("UPDATE STATS set Plays = Plays + 1, Won = Won + %i, Lost = Lost + %i WHERE Title = 'General'"
+            cur.execute("UPDATE STATS set Won = Won + %i, Lost = Lost + %i WHERE Title = 'General'"
                         % (ALLwins, Lose))
             # conn.commit()
 
@@ -334,6 +334,8 @@ async def endgame(chatid):
 
         if WINstat == '':
             WINstat = 'Вах, никто нэ выиграл'
+
+        cur.execute("UPDATE STATS set Plays = Plays + 1 WHERE Title = 'General'")
 
         await asyncio.sleep(3)
         await bot.send_message(chatid, "🎲  %s\nСтавки:\n%s \n%s" % (Numbers, Fstat, WINstat))
