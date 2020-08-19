@@ -32,6 +32,12 @@ async def advice_anti_spam(message, *args, **kwargs):
     await message.reply("Не спамь")
 
 
+@dp.message_handler(text="delgame")
+async def delgame(message):
+    cur.execute("DELETE FROM game WHERE IDChat = %i" % message.chat.id)
+    conn.commit()
+
+
 @dp.message_handler(commands=['start'])
 async def start_message(message):
     userid = message.from_user.id
