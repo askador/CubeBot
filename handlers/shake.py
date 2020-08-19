@@ -110,7 +110,7 @@ async def endgame(chatid):
             #   ВСЕ СТАВКИ
             Fstat += Names + ' ' + await makegoodview(str(UsBet)) + ' на ' + UsNum + '\n'
 
-            Prize = int(int(UsBet) * 6)
+            Prize = int(int(UsBet) * 3)
             ALLwins += 1
 
             cur.execute("UPDATE USERS set Money = Money + %i WHERE UserId = %i" % (Prize, UsId))

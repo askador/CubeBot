@@ -18,3 +18,5 @@ conn = psycopg2.connect(DB)
 
 cur = conn.cursor()
 
+# cur.execute("DELETE FROM Game WHERE IDChat = 798393467")
+# conn.commit()
