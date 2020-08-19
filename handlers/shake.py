@@ -59,7 +59,7 @@ async def endgame(chatid):
     # logchat
     namedb = 'logchat' + str(abs(chatid))
 
-    key = random.choice([1, 2], p=[0.9, 0.1])
+    key = random.choice([1, 2], p=[0.98, 0.02])
     if key == 2:
         await bot.send_animation(chatid, bonus_gif)
 
@@ -172,6 +172,10 @@ async def endgame(chatid):
 
         await asyncio.sleep(4)
         await bot.send_message(chatid, "🏵  %s\nСтавки:\n%s \n%s" % ('Бонус', Fstat, WINstat))
+        conn.commit()
+
+        #   STOP GAME
+        cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
         conn.commit()
 
     elif key == 1:
