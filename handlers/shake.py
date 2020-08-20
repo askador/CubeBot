@@ -193,7 +193,7 @@ async def endgame(chatid):
     # update plays stats
     list_of_plays = list(set(list_of_plays))
     for i in range(len(list_of_plays)):
-        cur.execute("UPDATE USERS set Plays = Plays + 1 WHERE UserId = %i")
+        cur.execute("UPDATE USERS set Plays = Plays + 1 WHERE UserId = %i" % list_of_plays[i])
         # achievements
         try:
             plays = await achieves_plays(list_of_plays[i])
