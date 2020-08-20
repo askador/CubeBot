@@ -59,7 +59,7 @@ async def endgame(chatid):
     namedb = 'logchat' + str(abs(chatid))
 
     # Выбор кубика (бонусный, обычный)
-    key = random.choice([1, 2], p=[0.98, 0.02])
+    key = random.choice([1, 2], p=[0.91, 0.09])
 
     cur.execute("SELECT UserId FROM bets WHERE IDChat = %i" % chatid)
     not_bonus = cur.fetchall()

@@ -58,7 +58,7 @@ async def start_giveaway(message):
 
     giveaway_mes = await message.answer(f"<a href='tg://user?id={userid}'>{fullname}</a> "
                                         f"устраивает раздачу лавэ {await makegoodview(how_much)}\n"
-                                        f"Правила:\n"
+                                        f"\n"
                                         f"Нажимайте на кнопку, набирайте больше всех очков\n"
                                         f"Награда распределится по количеству набранных очков\n"
                                         f"Раздача лавэ через 02:30",
