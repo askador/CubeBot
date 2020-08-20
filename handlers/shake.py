@@ -188,42 +188,43 @@ async def endgame(chatid):
 
         await check_limit_money(UsId)
 
+
+
+    # update plays stats
+    list_of_plays = list(set(list_of_plays))
+    for i in range(len(list_of_plays)):
         cur.execute("UPDATE USERS set Plays = Plays + 1 WHERE UserId = %i")
-
-        # update plays stats
-        list_of_plays = list(set(list_of_plays))
-        for i in range(len(list_of_plays)):
-            # achievements
-            try:
-                plays = await achieves_plays(list_of_plays[i])
-                for k in range(len(plays)):
-                    title = plays[k][0]
-                    moni = plays[k][1]
-                    await bot.send_message(chatid, f"⭐️ {list_of_names[list_of_plays[i]]} получает достижение "
-                                                   f"\n<b>{title}</b>\n"
-                                                   f"Держи награду +{moni}")
-
-                end = await achievs_balance(list_of_plays[i])
-                for j in range(len(end)):
-                    gift = end[j][1]
-                    which = end[j][0]
-                    await bot.send_message(chatid, f"⭐️ {list_of_names[list_of_plays[i]]} получает достижение "
-                                                   f"\n<b>{which}</b>\n"
-                                                   f"Держи награду +{gift}")
-
-            except Exception as e:
-                pass
-
+        # achievements
         try:
-            for h in range(len(Wonmaxnum)):
-                titleV = Wonmaxnum[h][0]
-                moniV = Wonmaxnum[h][1]
-                useridV = Wonmaxnum[h][2]
-                await bot.send_message(chatid, f"⭐️ {list_of_names[useridV]} получает достижение "
-                                               f"\n<b>{titleV}</b>\n"
-                                               f"Держи награду +{moniV}")
-        except Exception:
+            plays = await achieves_plays(list_of_plays[i])
+            for k in range(len(plays)):
+                title = plays[k][0]
+                moni = plays[k][1]
+                await bot.send_message(chatid, f"⭐️ {list_of_names[list_of_plays[i]]} получает достижение "
+                                               f"\n<b>{title}</b>\n"
+                                               f"Держи награду +{moni}")
+
+            end = await achievs_balance(list_of_plays[i])
+            for j in range(len(end)):
+                gift = end[j][1]
+                which = end[j][0]
+                await bot.send_message(chatid, f"⭐️ {list_of_names[list_of_plays[i]]} получает достижение "
+                                               f"\n<b>{which}</b>\n"
+                                               f"Держи награду +{gift}")
+
+        except Exception as e:
             pass
+
+    try:
+        for h in range(len(Wonmaxnum)):
+            titleV = Wonmaxnum[h][0]
+            moniV = Wonmaxnum[h][1]
+            useridV = Wonmaxnum[h][2]
+            await bot.send_message(chatid, f"⭐️ {list_of_names[useridV]} получает достижение "
+                                           f"\n<b>{titleV}</b>\n"
+                                           f"Держи награду +{moniV}")
+    except Exception:
+        pass
 
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
