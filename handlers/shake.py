@@ -37,7 +37,7 @@ async def shake(name, userid, chatid):
     await endgame(chatid)
 
 
-async def endgame(chatid, day):
+async def endgame(chatid):
     list_of_plays = []
     list_of_names = {}
     Wonmaxnum = []
