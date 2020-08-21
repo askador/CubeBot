@@ -780,7 +780,7 @@ async def transfer_money(message):
                 await message.reply("Oops. something went wrong. Try again.")
             else:
                 conn.commit()
-        elif 10 ** 18 < int(''.join(message.text[2:].split(','))):
+        elif 10 ** 18 <= int(''.join(message.text[2:].split(','))):
             await message.reply("Передать можно не больше 1,000,000,000,000,000,000 за раз")
     except Exception:
         await message.reply("Не удалось передать деньги")

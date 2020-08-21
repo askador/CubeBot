@@ -61,6 +61,8 @@ async def endgame(chatid):
     # Выбор кубика (бонусный, обычный)
     key = random.choice([1, 2], p=[0.91, 0.09])
 
+    # антихалява с помощью бонусного куба
+    # если у одного игрока в игре ставки на все числа, то бонусной куб не будет падать
     cur.execute("SELECT UserId FROM bets WHERE IDChat = %i" % chatid)
     not_bonus = cur.fetchall()
     for i in list(set(not_bonus)):

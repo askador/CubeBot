@@ -111,7 +111,6 @@ class User:
         except Exception as e:
             await msg.reply("Oops. something went wrong. Try again.")
 
-
     async def cancel_bets(self, msg):
         cur.execute("SELECT count(Bet) FROM BETS WHERE UserId = %i AND IDChat = %i" % (self.userid, self.chatid))
         useringame = cur.fetchall()[0][0]
