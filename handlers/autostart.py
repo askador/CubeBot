@@ -26,6 +26,7 @@ async def game_autostart(chatid, id_game):
             cur.execute("DELETE FROM todelmes where idchat = '%i'" % chatid)
             conn.commit()
 
+
             await endgame(chatid)
 
             # Clearing bets table

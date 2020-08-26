@@ -406,7 +406,7 @@ async def shake_game(message):
 # ПРОВЕРКА НА СТАВКУ
 @dp.message_handler(regexp="(\d[' ']\d)$")
 @dp.message_handler(regexp="(\d[ ]\d[-]\d)$")
-async def chekbet(message: types.Message):
+async def checkbet(message: types.Message):
     chatid = message.chat.id
     #    ВЫГРУЗКА GAME
     try:
