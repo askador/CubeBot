@@ -43,30 +43,28 @@ class Game:
 
     async def play(self, message):
         delay_start = 20
-        print("WHATS POPPING")
         # Запуск игры
-        try:
-            print(self.chatid)
-            cur.execute("SELECT Shake FROM Game WHERE IDChat = %i" % self.chatid)
-            is_game = cur.fetchall()
-        except Exception as e:
-            pass
-        else:
-            if is_game:
-                mes3 = await message.reply("Игра уже запущена")
-                await to_del_mess(self.chatid, mes3.message_id)
-
-            elif not is_game:
-                cur.execute("INSERT INTO Game (IDChat, Shake, Time, Shaking) VALUES (%i, False, %i, False)"
-                            % (self.chatid, int(message.date.timestamp()) + delay_start))
-                conn.commit()
-
-                await self.start_game_message()
-
-                cur.execute("SELECT Id FROM GAME WHERE Time = %i" % (int(message.date.timestamp()) + delay_start))
-                id_game = cur.fetchall()[0][0]
-                ioloop = asyncio.get_event_loop()
-
-                ioloop.create_task(game_autostart(self.chatid, id_game)),  # autostart
-                ioloop.create_task(checking_bets(message.chat.id))
+        # try:
+        cur.execute("SELECT Shake FROM Game WHERE IDChat = %i" % self.chatid)
+        is_game = cur.fetchall()
+        # except Exception as e:
+        #     pass
+        # else:
+        #     if is_game:
+        #         mes3 = await message.reply("Игра уже запущена")
+        #         await to_del_mess(self.chatid, mes3.message_id)
+        #
+        #     elif not is_game:
+        #         cur.execute("INSERT INTO Game (IDChat, Shake, Time, Shaking) VALUES (%i, False, %i, False)"
+        #                     % (self.chatid, int(message.date.timestamp()) + delay_start))
+        #         conn.commit()
+        #
+        #         await self.start_game_message()
+        #
+        #         cur.execute("SELECT Id FROM GAME WHERE Time = %i" % (int(message.date.timestamp()) + delay_start))
+        #         id_game = cur.fetchall()[0][0]
+        #         ioloop = asyncio.get_event_loop()
+        #
+        #         ioloop.create_task(game_autostart(self.chatid, id_game)),  # autostart
+        #         ioloop.create_task(checking_bets(message.chat.id))
 
