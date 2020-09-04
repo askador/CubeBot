@@ -5,9 +5,9 @@ import asyncio
 from datetime import datetime
 from aiogram import types
 
-from handlers.autostart import bonus_autostart
-from misc import conn, cur, bot
-from handlers.achievements import achieves_bonus, check_limit_money
+from utils.autostart import bonus_autostart
+from data.misc import conn, cur, bot
+from utils.achievements import achieves_bonus, check_limit_money
 
 
 class Bonus:
@@ -148,7 +148,7 @@ class Bonus:
 
                 cur.execute("SELECT Money From USERS Where UserId = %i" % self.userid)
                 money = cur.fetchall()[0][0]
-                if money > 1000000000:  # 1 000 000 000
+                if money > 100000000:  # 100 000 000
                     lavebonus = int(random.randrange(15000, 25000))
                 else:
                     lavebonus = int(random.randrange(1500, 2500))

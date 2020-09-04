@@ -3,8 +3,8 @@ from aiogram import types
 import asyncio
 from datetime import datetime
 
-from misc import conn, cur, bot
-from handlers.add_func import makegoodview
+from data.misc import conn, cur, bot
+from utils.add_func import makegoodview
 
 
 async def create_db(chatid):

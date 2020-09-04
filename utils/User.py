@@ -1,7 +1,8 @@
 # coding=utf-8
 
-from misc import conn, cur
-from handlers.add_func import makegoodview, to_del_mess
+from data.misc import conn, cur
+from utils.add_func import makegoodview, to_del_mess
+from utils.stats import new_members
 
 
 class User:
@@ -12,7 +13,7 @@ class User:
         self.userid = userid
         self.chatid = chatid
 
-    async def add_user_data(self):
+    async def add_user_data(self, month=None):
         #   ДОБАВЛЕНИЕ ИГРОКОВ
         try:
             cur.execute("SELECT Count(UserId) FROM USERS WHERE UserId = '%i'" % self.userid)
@@ -23,6 +24,10 @@ class User:
                             "Lost, Won, Bonus_mes_id, Giveaway_time, Plays, Show_stat) "
                             f"VALUES ('{self.fullname}','{self.username}','{self.userid}', "
                             f"5000, 0, 0, 0, Null, 0, 0, true)")
+
+                if month is not None:
+                    await new_members(month)
+
             if UserdIds > 1:
                 cur.execute(
                     "DELETE FROM USERS WHERE Id = (SELECT MAX(ID) FROM USERS WHERE USERID = '%i')" % self.userid)

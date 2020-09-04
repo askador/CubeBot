@@ -1,16 +1,19 @@
 # coding=utf-8
 
 import asyncio
-from misc import bot, cur, conn
+from datetime import datetime
+
+from data.misc import cur, conn, parts, bot
 from handlers.add_func import makegoodview
 from handlers.achievements import check_limit_money, achieves_plays, achievs_balance, max_win
+from utils.stats import *
 from numpy import random
 
 bonus_gif = 'CAACAgIAAxkBAAJZsF7ayGQo1aCENzBjuSqMjH-LIrhZAAIHAANUuGEf5o6jSM3m8uIaBA'
 
 
 #  start shaking  --> endgame
-async def shake(name, userid, chatid):
+async def shake(name, userid, chatid, day):
     # deleting all messages from bot in game
     cur.execute("SELECT MessId FROM ToDelMes WHERE IDChat = '%i'" % chatid)
     messid = cur.fetchall()
@@ -34,10 +37,12 @@ async def shake(name, userid, chatid):
         pass
 
     #   ВЫГРУЗКА ВСЕХ СТАВОК
-    await endgame(chatid)
+    await endgame(chatid, day)
 
 
-async def endgame(chatid):
+async def endgame(chatid, day):
+    time = int(datetime.now().timestamp()) + 10800
+
     list_of_plays = []
     list_of_names = {}
     Wonmaxnum = []
@@ -190,12 +195,23 @@ async def endgame(chatid):
 
         await check_limit_money(UsId)
 
-
-
     # update plays stats
     list_of_plays = list(set(list_of_plays))
     for i in range(len(list_of_plays)):
         cur.execute("UPDATE USERS set Plays = Plays + 1 WHERE UserId = %i" % list_of_plays[i])
+
+        current_time = str(datetime.fromtimestamp(time)).split()
+        day_num = int(current_time[0].split('-')[2])
+        month = int(current_time[0].split('-')[1])
+        time = current_time[1][:5]
+        current_part = 0
+        for j in range(8):
+            if int(parts[str(j)].split('-')[0][:2]) <= int(time[:2]) < int(parts[str(j)].split('-')[1][:2]):
+                current_part = j
+                break
+        time = parts[str(current_part % 8)] + ' ' + str(day_num).zfill(2) + '/' + str(month).zfill(2)
+        await players_activity_per3h(time)
+
         # achievements
         try:
             plays = await achieves_plays(list_of_plays[i])
@@ -231,6 +247,9 @@ async def endgame(chatid):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
+    await general_stats(ALLwins, Lose)
+    await daily_plays(day)
+
     await asyncio.sleep(3)
 
     if key == 1:
@@ -238,8 +257,4 @@ async def endgame(chatid):
     elif key == 2:
         await bot.send_message(chatid, "🏵  %s\nСтавки:\n%s \n%s" % ('Бонус', Fstat, WINstat))
 
-    conn.commit()
-
-    #   STOP GAME
-    cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
     conn.commit()

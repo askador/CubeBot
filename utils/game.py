@@ -2,10 +2,10 @@
 import asyncio
 from aiogram import types
 
-from misc import bot, conn, cur
-from handlers.add_func import to_del_mess
-from handlers.autostart import game_autostart
-from handlers.bets import checking_bets
+from data.misc import bot, conn, cur
+from utils.add_func import to_del_mess
+from utils.autostart import game_autostart
+from utils.bets import checking_bets
 
 
 class Game:
@@ -34,9 +34,7 @@ class Game:
 
         game_kb.row(t12, t34, t56)
 
-        start_mes = await bot.send_message(self.chatid, "🧖🏽‍♂️Бросаем кубики нэ стесняемся🎲\n"
-                                                        "Угадай число от 1 до 6\n"
-                                                        "Делай ставки не скупи💰\n"
+        start_mes = await bot.send_message(self.chatid, "Угадай число от 1 до 6🎲\n"
                                                         "\n"
                                                         "<i>%п</i> - повтор, <i>%у</i> - удвоить\n"
                                                         "<i>ставки</i> - ваши ставки\n"

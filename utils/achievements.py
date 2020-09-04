@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from misc import conn, cur
+from data.misc import conn, cur
 
 
 async def achievs_balance(userid):

@@ -1,5 +1,5 @@
 # coding=utf-8
-from misc import conn, cur
+from data.misc import conn, cur
 
 
 async def to_del_mess(chatid, mess_id):
@@ -21,3 +21,10 @@ async def makegoodview(how):
         del how[0]
     how = ''.join(how)
     return how
+
+
+# get dict key
+async def get_key(d, value):
+    for k, v in d.items():
+        if v == value:
+            return k

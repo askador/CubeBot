@@ -4,16 +4,17 @@ from aiogram import types
 from aiogram.utils.exceptions import TelegramAPIError
 from datetime import datetime
 
-from misc import dp, bot, conn, cur
-from handlers.add_func import to_del_mess, makegoodview
-from handlers.User import User
-from handlers.Chat import Chat
-from handlers.game import Game
-from handlers.bets import Bets
-from handlers.shake import shake
-from handlers.bonus import Bonus
-from handlers.achievements import check_limit_money
-from handlers.giveaway_start import create_db, start_giveaway
+from data.misc import conn, cur, months, days, days_in_month, parts, dp, bot
+from utils.add_func import to_del_mess, makegoodview
+from utils.User import User
+from utils.Chat import Chat
+from utils.game import Game
+from utils.bets import Bets
+from utils.shake import shake
+from utils.bonus import Bonus
+from utils.achievements import check_limit_money
+from utils.giveaway_start import create_db, start_giveaway
+from utils.stats import show_players_activity, show_daily_plays, show_new_members, show_general_stats
 
 
 async def bonus_throttled(callback_query, *args, **kwargs):
@@ -32,12 +33,6 @@ async def advice_anti_spam(message, *args, **kwargs):
     await message.reply("Не спамь")
 
 
-@dp.message_handler(text="delgame")
-async def delgame(message):
-    cur.execute("DELETE FROM game WHERE IDChat = %i" % message.chat.id)
-    conn.commit()
-
-
 @dp.message_handler(commands=['start'])
 async def start_message(message):
     userid = message.from_user.id
@@ -47,7 +42,7 @@ async def start_message(message):
         itembtna = types.KeyboardButton('Кости')
         trasti = types.KeyboardButton('Трясти')
         startkb.add(itembtna, trasti)
-        await bot.send_message(message.chat.id, "Добро пожаловать, в Cube Bot!\n"
+        await bot.send_message(message.chat.id, "Добро пожаловать, в Cube!\n"
                                                 "Испытай удачу, бросив кубик 🎲\n"
                                                 "Делай ставочки, угадывай числа\n"
                                                 "Выигрывай лавэ💰\n"
@@ -61,7 +56,7 @@ async def start_message(message):
                                                 "/bonuslave - бонус\n"
                                                 "/advice [текст] - предложение для доработок", reply_markup=startkb)
     else:
-        await bot.send_message(message.chat.id, "Добро пожаловать, в Cube Bot!\n"
+        await bot.send_message(message.chat.id, "Добро пожаловать, в Cube!\n"
                                                 "Испытай удачу, бросив кубик 🎲\n"
                                                 "Делай ставочки, угадывай числа\n"
                                                 "Выигрывай лавэ💰\n"
@@ -243,88 +238,48 @@ async def s(message):
         pass
 
 
-@dp.message_handler(text='/statslog')
+@dp.message_handler(text='/general_stats')
 async def stats(message):
     if message.from_user.id == 526497876 or message.from_user.id == 547400918:
-        stat = ''
-
-        try:
-            cur.execute("SELECT Plays FROM STATS WHERE Title = 'General'")
-            AllPlays = cur.fetchall()[0][0]
-            cur.execute("SELECT Won FROM STATS WHERE Title = 'General'")
-            Won = cur.fetchall()[0][0]
-            cur.execute("SELECT Lost FROM STATS WHERE Title = 'General'")
-            Lost = cur.fetchall()[0][0]
-        except Exception as e:
-            await message.answer(f"Something went wrong\n{e}")
-        else:
-            try:
-                Winfactor = round((int(Won) / int(Lost)), 3)
-            except Exception:
-                Winfactor = 0
-            stat += f"<b>Всего сыграно:</b> {AllPlays}\n" \
-                    f"<b>Коэффициент выигрыша:</b> {Winfactor}\n\n"
-
-            # cur.execute("SELECT IdChat FROM STATS WHERE IdChat is not Null AND Plays > 0")
-            # chats = cur.fetchall()
-            # for i in range(len(chats)):
-            #     cur.execute("SELECT Title FROM STATS WHERE IDChat = %i" % chats[i][0])
-            #     title = cur.fetchall()[0][0]
-            #
-            #     cur.execute("SELECT Plays FROM STATS WHERE IDChat = %i" % chats[i][0])
-            #     plays = cur.fetchall()[0][0]
-            #
-            #     cur.execute("SELECT Won FROM STATS WHERE IDChat = %i" % chats[i][0])
-            #     Won = cur.fetchall()[0][0]
-            #
-            #     cur.execute("SELECT Lost FROM STATS WHERE IDChat = %i" % chats[i][0])
-            #     Lost = cur.fetchall()[0][0]
-            #
-            #     cur.execute("SELECT bets_num FROM STATS WHERE IDChat = %i" % chats[i][0])
-            #     bets_num = cur.fetchall()[0][0]
-            #
-            #     cur.execute("SELECT Last_activity FROM STATS WHERE IDChat = %i" % chats[i][0])
-            #     last_activity = cur.fetchall()[0][0]
-            #
-            #
-            #     try:
-            #         avrg_bets_num = round((int(bets_num) / int(plays)), 3)
-            #     except Exception:
-            #         avrg_bets_num = 0
-            #     try:
-            #         win_factor = round((int(Won) / int(Lost)), 3)
-            #     except Exception:
-            #         win_factor = 0
-            #
-            #     stat += f"Chat Id: <b>{chats[i][0]}</b>\n" \
-            #             f"Title: <b>{title}</b>\n" \
-            #             f"Plays: <b>{plays}</b>\n" \
-            #             f"Win Factor: <b>{win_factor}</b>\n" \
-            #             f"Average bets number: <b>{avrg_bets_num}</b>\n" \
-            #             f"Last activity: <b>{last_activity}</b>\n\n"
-            await bot.send_message(message.chat.id, stat)
+        stat = await show_general_stats()
+        await bot.send_message(message.chat.id, stat)
 
 
-@dp.message_handler(regexp="/statslog сбросить")
-async def stats_rollback(message):
-    try:
-        if message.text.split()[2] == "все":
-            cur.execute("UPDATE STATS set Plays = 0, Won = 0, Lost = 0, Bets_Num = 0")
-            await message.answer("Все сброшено")
-    except Exception as e:
-        conn.rollback()
-    else:
-        conn.commit()
+@dp.message_handler(text='/pl_act')
+async def stats(message):
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        stat = await show_players_activity()
+        await bot.send_photo(message.chat.id, stat)
 
-    try:
-        if message.text.split()[2].isdigit:
-            cur.execute("UPDATE STATS set Plays = 0, Won = 0, Lost = 0, Bets_Num = 0 WHERE IDChat = %s" %
-                        message.text.split()[2])
-            await message.answer("Сброшено %s" % message.text.split()[2])
-    except Exception as e:
-        conn.rollback()
-    else:
-        conn.commit()
+
+@dp.message_handler(text='/daily_p')
+async def stats(message):
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        stat = await show_daily_plays()
+        await bot.send_photo(message.chat.id, stat)
+
+
+@dp.message_handler(text='/new_p')
+async def stats(message):
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        stat = await show_new_members()
+        await bot.send_photo(message.chat.id, stat)
+
+
+@dp.message_handler(text='/all_stats')
+async def stats(message):
+    if message.from_user.id == 526497876 or message.from_user.id == 547400918:
+        general = await show_general_stats()
+        await bot.send_message(message.chat.id, general)
+
+        active = await show_players_activity()
+        await bot.send_photo(message.chat.id, active)
+
+        plays = await show_daily_plays()
+        await bot.send_photo(message.chat.id, plays)
+
+        new = await show_new_members()
+        await bot.send_photo(message.chat.id, new)
 
 
 #  |  ЗАПУСК ИГРЫ  |
@@ -386,9 +341,22 @@ async def shake_game(message):
                     cur.execute("UPDATE Game set Shaking = True WHERE IDChat = %i" % chatid)
                     conn.commit()
                     name = message.from_user.first_name
-                    await shake(name, userid, chatid)
+
+                    time = int(datetime.now().timestamp()) + 10800
+                    date = str(datetime.fromtimestamp(time)).split()[0].split('-')
+                    weekday = str(days[
+                                      str(int(datetime.fromtimestamp(time).weekday()) + 1)
+                                  ])
+                    day = date[2]
+                    month = date[1]
+                    year = date[0][2:]
+                    day = f"{weekday} {day}/{month}/{year}".rstrip('\n')
+                    await shake(name, userid, chatid, day)
 
                     cur.execute("DELETE FROM GAME WHERE IDChat = %i" % chatid)
+                    conn.commit()
+
+                    cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
                     conn.commit()
                 else:
                     mmes = await message.answer("Бросить можно через %s сек" %
@@ -445,7 +413,11 @@ async def process_callback_game_buttons(callback_query: types.CallbackQuery):
                 userid = callback_query.from_user.id
                 fullname = callback_query.from_user.full_name
                 username = callback_query.from_user.username
-                await User(fullname, username, userid, chatid).add_user_data()
+
+                month = str(int(str(callback_query.message.date).split()[0].split('-')[1]))
+                year = str(callback_query.message.date).split()[0].split('-')[0]
+                month = months[month] + ' ' + year
+                await User(fullname, username, userid, chatid).add_user_data(month)
 
                 text = f'5 {callback_query.data}'
                 await Bets(text, fullname, username, userid, chatid).bet_check()
@@ -461,7 +433,6 @@ async def repeat_bet(message):
         cur.execute("SELECT Shaking FROM GAME WHERE IDChat = %i" % chatid)
         Shaking = cur.fetchall()
     except Exception as e:
-        
         await message.reply("Oops, something went wrong")
     else:
         if Shaking:
@@ -562,7 +533,12 @@ async def usermoney(message):
     userid = message.from_user.id
     chatid = message.chat.id
 
-    await User(name, username, userid, chatid).add_user_data()
+    time = int(datetime.now().timestamp()) + 10800
+    date = str(datetime.fromtimestamp(time)).split()[0].split('-')
+    month = str(int(date[1][:3]))
+    year = date[0]
+    month = months[month] + ' ' + year
+    await User(name, username, userid, chatid).add_user_data(month)
 
     await User(name, username, userid, chatid).lave(message)
 
@@ -601,6 +577,7 @@ async def drop_stats(message):
             await message.answer("Стата сброшена")
     except Exception as e:
         await message.reply("Oops. something went wrong. Try again.")
+        conn.rollback()
     else:
         conn.commit()
 
@@ -745,7 +722,7 @@ async def top_10(message):
 @dp.message_handler(regexp="(^[+][г])([' ']*)(\d)")
 async def transfer_money(message):
     try:
-        if 0 < int(''.join(message.text[2:].split(','))) < 10 ** 18 and message.reply_to_message is not None:
+        if 0 < int(''.join(message.text[2:].split(','))) <= 10 ** 18 and message.reply_to_message is not None:
             name = message.from_user.full_name
             username = message.from_user.username
             userid = message.from_user.id
@@ -794,7 +771,10 @@ async def bonus(message):
     bonuserid = message.from_user.id
     username = message.from_user.username
 
-    await User(fullname, username, bonuserid, chatid).add_user_data()
+    month = str(message.date).split()[0].split('-')[1]
+    year = str(message.date).split()[0].split('-')[0]
+    month = months[month] + ' ' + year
+    await User(fullname, username, bonuserid, chatid).add_user_data(month)
     await Bonus(fullname, bonuserid, chatid).bonus(message)
 
 
@@ -893,5 +873,4 @@ async def scores(callback_query: types.CallbackQuery):
 
 @dp.errors_handler(exception=TelegramAPIError)
 async def error_handler(update, e):
-    
     return True

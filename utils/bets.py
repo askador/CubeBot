@@ -1,8 +1,8 @@
 # coding=utf-8
 
 import asyncio
-from misc import conn, cur, bot
-from handlers.add_func import to_del_mess, makegoodview
+from data.misc import conn, cur, bot
+from utils.add_func import to_del_mess, makegoodview
 from handlers.achievements import check_limit_money
 
 

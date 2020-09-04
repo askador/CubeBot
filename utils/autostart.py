@@ -1,8 +1,8 @@
 # coding=utf-8
 import asyncio
 
-from misc import conn, cur, bot
-from handlers.shake import endgame
+from data.misc import conn, cur, days, bot
+from utils.shake import endgame
 
 
 async def game_autostart(chatid, id_game):
@@ -26,8 +26,16 @@ async def game_autostart(chatid, id_game):
             cur.execute("DELETE FROM todelmes where idchat = '%i'" % chatid)
             conn.commit()
 
+            import datetime
 
-            await endgame(chatid)
+            time = int(datetime.datetime.now().timestamp()) + 10800
+            date = str(datetime.datetime.fromtimestamp(time)).split()[0].split('-')
+            weekday = str(days[str(datetime.datetime.fromtimestamp(time).weekday())])
+            day = date[2]
+            month = date[1]
+            year = date[0][2:]
+            day = weekday + ' ' + day + '/' + month + '/' + year
+            await endgame(chatid, day)
 
             # Clearing bets table
             cur.execute("DELETE FROM BETS WHERE IDChat = %i" % chatid)
