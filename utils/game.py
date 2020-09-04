@@ -49,7 +49,7 @@ class Game:
             cur.execute("SELECT Time FROM Game WHERE IDChat = %i" % self.chatid)
             is_game = cur.fetchall()
         except Exception as e:
-            print(e)
+            pass
         else:
             if is_game:
                 mes3 = await message.reply("Игра уже запущена")
