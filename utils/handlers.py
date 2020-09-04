@@ -771,7 +771,7 @@ async def bonus(message):
     bonuserid = message.from_user.id
     username = message.from_user.username
 
-    month = str(message.date).split()[0].split('-')[1]
+    month = str(int(str(message.date).split()[0].split('-')[1]))
     year = str(message.date).split()[0].split('-')[0]
     month = months[month] + ' ' + year
     await User(fullname, username, bonuserid, chatid).add_user_data(month)
