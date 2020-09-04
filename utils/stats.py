@@ -17,7 +17,7 @@ async def general_stats(won, lost):
     conn.commit()
 
 
-async def new_members():
+async def new_members(month):
     """
         id          Month        New_players
         1          Nov 2020        42
@@ -42,7 +42,7 @@ async def new_members():
         conn.commit()
 
 
-async def daily_plays():
+async def daily_plays(day):
     """
 
         id          day        plays
@@ -68,7 +68,7 @@ async def daily_plays():
         conn.commit()
 
 
-async def players_activity_per3h():
+async def players_activity_per3h(time):
     """
 
         id            time              players

@@ -212,7 +212,6 @@ async def endgame(chatid, day):
         time = parts[str(current_part % 8)] + ' ' + str(day_num).zfill(2) + '/' + str(month).zfill(2)
         await players_activity_per3h(time)
 
-        print("215")
         # achievements
         try:
             plays = await achieves_plays(list_of_plays[i])
@@ -248,7 +247,6 @@ async def endgame(chatid, day):
     if WINstat == '':
         WINstat = 'Вах, никто нэ выиграл'
 
-    print("251")
     await general_stats(ALLwins, Lose)
     await daily_plays(day)
 
