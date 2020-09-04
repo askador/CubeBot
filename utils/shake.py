@@ -4,8 +4,8 @@ import asyncio
 from datetime import datetime
 
 from data.misc import cur, conn, parts, bot
-from handlers.add_func import makegoodview
-from handlers.achievements import check_limit_money, achieves_plays, achievs_balance, max_win
+from utils.add_func import makegoodview
+from utils.achievements import check_limit_money, achieves_plays, achievs_balance, max_win
 from utils.stats import *
 from numpy import random
 
