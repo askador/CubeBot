@@ -46,10 +46,10 @@ class Game:
         print("WHATS POPPING")
         # Запуск игры
         try:
+            print(self.chatid)
             cur.execute("SELECT Shake FROM Game WHERE IDChat = %i" % self.chatid)
             is_game = cur.fetchall()
         except Exception as e:
-            print(e)
             pass
         else:
             if is_game:
