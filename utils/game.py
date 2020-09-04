@@ -43,12 +43,13 @@ class Game:
 
     async def play(self, message):
         delay_start = 20
-
+        print("WHATS POPPING")
         # Запуск игры
         try:
             cur.execute("SELECT Shake FROM Game WHERE IDChat = %i" % self.chatid)
             is_game = cur.fetchall()
         except Exception as e:
+            print(e)
             pass
         else:
             if is_game:
