@@ -293,8 +293,9 @@ async def start_game(message):
         title = message.chat.first_name
     date = str(datetime.fromtimestamp(message.date.timestamp() + 10800))
 
+    print("DONE")
     await Chat(chatid, title, date).add_chat_data()
-
+    print("START")
     await Game(chatid).play(message)
 
 
