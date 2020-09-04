@@ -45,7 +45,7 @@ class Game:
         delay_start = 20
         # Запуск игры
         # try:
-        cur.execute("SELECT Shake FROM Game WHERE IDChat = %i" % self.chatid)
+        cur.execute("SELECT Shake FROM Game WHERE IDChat = %s" % self.chatid)
         is_game = cur.fetchall()
         # except Exception as e:
         #     pass
