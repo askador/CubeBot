@@ -22,20 +22,6 @@ class Chat:
         else:
             conn.commit()
 
-        try:
-            cur.execute("SELECT count(IdChat) From Stats WHERE IdChat = '%i'" % self.chatid)
-            title_count = cur.fetchall()[0][0]
-            if title_count < 1:
-                cur.execute("INSERT INTO Stats (Title, IdChat, Plays, Won, Lost, "
-                            "Bets_num, Last_activity) "
-                            "VALUES ('%s', '%i', 0, 0, 0, 0, '%s')" % (self.title, self.chatid, self.date))
-            else:
-                cur.execute("UPDATE Stats set Title = '%s', Last_activity = '%s' WHERE IdChat = '%i'" %
-                            (self.title, self.date, self.chatid))
-        except Exception as e:
-            pass
-        else:
-            conn.commit()
 
     async def logs(self, message):
         LOG = ''
