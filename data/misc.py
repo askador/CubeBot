@@ -1,8 +1,8 @@
 # coding=utf-8
 
 import psycopg2
-from BotCube.data.config import DB
-from BotCube.data.config import token
+from data.config import DB
+from data.config import token
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
